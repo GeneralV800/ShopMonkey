@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>🏠 The Garage</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06070e;--pnl:#0c0d16;--card:#0f1019;--bdr:#181929;
+  --amb:#f5a100;--amb2:#ffc240;--red:#e94444;--grn:#17c97f;
+  --blu:#4ca8f7;--txt:#dde2f0;--t2:#7c8499;--t3:#3a4158;
+}
+body{background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,'Segoe UI',sans-serif;min-height:100vh;overflow-x:hidden}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit}
+a{color:var(--amb);text-decoration:none}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-track{background:var(--pnl)}
+::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
+#loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:999}
+#loading .spinner{width:28px;height:28px;border:2px solid var(--bdr);border-top-color:var(--amb);border-radius:50%;animation:spin .8s linear infinite}
+#loading .lbl{font-size:11px;color:var(--t2);letter-spacing:.12em}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hdr{background:var(--pnl);border-bottom:1px solid var(--bdr);padding:12px 16px}
+.hdr-row{display:flex;align-items:center;gap:10px}
+.back-btn{background:none;border:none;color:var(--amb);font-size:20px;padding:0 4px;line-height:1;flex-shrink:0}
+.hdr-title{font-size:15px;font-weight:700;letter-spacing:.02em;flex:1}
+.hdr-sub{font-size:11px;color:var(--t2);margin-top:2px}
+.wrap{padding:14px 16px;max-width:640px;margin:0 auto;padding-bottom:80px}
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:8px;padding:13px 15px;margin-bottom:10px}
+.card-warn{border-color:color-mix(in srgb,var(--red) 40%,transparent)}
+.card-amber{border-color:color-mix(in srgb,var(--amb) 30%,transparent)}
+.sub-card{background:#0a0b14;border:1px solid var(--bdr);border-radius:6px;padding:10px 12px;margin-bottom:8px}
+.sub-card-hl{background:#1a1200;border-color:color-mix(in srgb,var(--amb) 40%,transparent)}
+.sub-card-red{background:#1a0000;border-color:color-mix(in srgb,var(--red) 40%,transparent)}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.tag-amb{background:color-mix(in srgb,var(--amb) 15%,transparent);color:var(--amb);border:1px solid color-mix(in srgb,var(--amb) 30%,transparent)}
+.tag-red{background:color-mix(in srgb,var(--red) 15%,transparent);color:var(--red);border:1px solid color-mix(in srgb,var(--red) 30%,transparent)}
+.tag-grn{background:color-mix(in srgb,var(--grn) 15%,transparent);color:var(--grn);border:1px solid color-mix(in srgb,var(--grn) 30%,transparent)}
+.tag-blu{background:color-mix(in srgb,var(--blu) 15%,transparent);color:var(--blu);border:1px solid color-mix(in srgb,var(--blu) 30%,transparent)}
+.tag-dim{background:color-mix(in srgb,var(--t3) 20%,transparent);color:var(--t2);border:1px solid color-mix(in srgb,var(--t3) 30%,transparent)}
+.tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.sec-head{font-size:10px;color:var(--t2);letter-spacing:.1em;font-weight:700;text-transform:uppercase;margin:16px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--bdr)}
+.part-brand{font-size:13px;color:var(--txt);font-weight:600}
+.part-pn{font-size:11px;color:var(--amb2);font-family:'Courier New',monospace;letter-spacing:.03em}
+.part-note{font-size:11px;color:var(--t2);margin:3px 0;line-height:1.5}
+.part-note-warn{color:var(--red)}
+.links{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.link-btn{font-size:10px;color:var(--amb);padding:3px 8px;border:1px solid color-mix(in srgb,var(--amb) 30%,transparent);border-radius:3px;display:inline-flex;gap:4px;align-items:center;transition:background .15s}
+.link-btn:hover{background:color-mix(in srgb,var(--amb) 10%,transparent)}
+.link-price{color:var(--t2)}
+.tabs{display:flex;gap:1px;overflow-x:auto;margin-top:10px;border-bottom:1px solid var(--bdr)}
+.tab-btn{padding:8px 13px;border:none;border-bottom:2px solid transparent;background:none;color:var(--t2);font-size:11px;font-weight:700;letter-spacing:.05em;white-space:nowrap;transition:color .15s,border-color .15s}
+.tab-btn.active{color:var(--amb);border-bottom-color:var(--amb)}
+.cat-btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.cat-btn{padding:6px 11px;border-radius:4px;border:1px solid var(--bdr);background:none;color:var(--t2);font-size:11px;transition:all .15s;display:flex;gap:4px;align-items:center}
+.cat-btn.active{border-color:var(--amb);background:color-mix(in srgb,var(--amb) 8%,transparent);color:var(--amb)}
+.inp{background:#0a0b14;border:1px solid #1e2030;border-radius:5px;padding:9px 11px;color:var(--txt);font-size:13px;width:100%;outline:none;transition:border-color .15s}
+.inp:focus{border-color:color-mix(in srgb,var(--amb) 50%,transparent)}
+.btn-primary{padding:11px 20px;border-radius:4px;border:none;background:var(--amb);color:#000;font-size:12px;font-weight:700;letter-spacing:.05em;transition:background .15s}
+.btn-primary:hover{background:var(--amb2)}
+.btn-ghost{padding:11px 16px;border-radius:4px;border:1px solid var(--bdr);background:none;color:var(--t2);font-size:12px;transition:border-color .15s}
+.btn-ghost:hover{border-color:var(--t2)}
+.btn-sm{padding:6px 13px;border-radius:4px;border:none;background:var(--amb);color:#000;font-size:11px;font-weight:700;letter-spacing:.04em}
+.btn-sm-ghost{padding:6px 12px;border-radius:4px;border:1px solid var(--bdr);background:none;color:var(--t2);font-size:10px;letter-spacing:.06em}
+.fld{margin-bottom:12px}
+.fld label{display:block;font-size:10px;color:var(--t2);letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px}
+.row2{display:flex;gap:10px}
+.row2>*{flex:1}
+.stat-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}
+.stat{display:flex;flex-direction:column;gap:2px}
+.stat-lbl{font-size:10px;color:var(--t2);letter-spacing:.06em;text-transform:uppercase}
+.stat-val{font-size:18px;font-weight:700}
+.divider{width:1px;background:var(--bdr)}
+.spec-row{display:flex;padding:9px 14px;border-bottom:1px solid var(--bdr)}
+.spec-key{font-size:10px;color:var(--t2);letter-spacing:.07em;text-transform:uppercase;min-width:140px;flex-shrink:0;padding-top:2px}
+.spec-val{font-size:13px;font-family:'Courier New',monospace;line-height:1.5}
+.spec-val-warn{color:var(--red)}
+.note-box{background:#1a0d00;border:1px solid color-mix(in srgb,var(--amb) 30%,transparent);border-radius:6px;padding:12px 14px;margin-top:12px}
+.note-box-head{font-size:10px;color:var(--amb);letter-spacing:.08em;font-weight:700;margin-bottom:6px}
+.note-box-txt{font-size:12px;color:var(--txt);line-height:1.7;white-space:pre-wrap}
+.log-row{background:#0a0b14;border:1px solid var(--bdr);border-radius:6px;padding:10px 13px;margin-bottom:8px}
+.log-svc{font-size:12px;color:var(--amb);font-weight:600}
+.log-cost{font-size:11px;color:var(--grn);font-family:'Courier New',monospace}
+.log-meta{font-size:11px;color:var(--t2);display:flex;gap:12px;flex-wrap:wrap;margin-top:3px}
+.log-note{font-size:11px;color:var(--txt);line-height:1.5;margin-top:4px}
+.log-veh{font-size:10px;color:var(--t3);margin-top:2px}
+.add-dashed{width:100%;background:none;border:2px dashed var(--bdr);border-radius:8px;padding:16px;text-align:center;color:var(--t2);font-size:12px;letter-spacing:.06em;margin-top:6px;transition:border-color .15s}
+.add-dashed:hover{border-color:var(--t2)}
+.alert-item{border-radius:6px;padding:9px 13px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.alert-overdue{background:color-mix(in srgb,var(--red) 10%,transparent);border:1px solid color-mix(in srgb,var(--red) 30%,transparent)}
+.alert-soon{background:color-mix(in srgb,var(--amb) 8%,transparent);border:1px solid color-mix(in srgb,var(--amb) 25%,transparent)}
+.all-good{background:color-mix(in srgb,var(--grn) 8%,transparent);border:1px solid color-mix(in srgb,var(--grn) 25%,transparent);border-radius:6px;padding:12px 16px;margin-bottom:16px;text-align:center}
+.intv-row{background:#0a0b14;border:1px solid var(--bdr);border-radius:5px;padding:8px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.intv-svc{font-size:12px;color:var(--txt)}
+.intv-schedule{font-size:10px;color:var(--t2)}
+.intv-last{text-align:right;flex-shrink:0}
+.intv-last-date{font-size:11px;color:var(--t2)}
+.intv-last-mi{font-size:10px;color:var(--t2)}
+.tire-info{background:#0a0b14;border:1px solid var(--bdr);border-radius:6px;padding:12px 14px;margin-bottom:12px}
+.fleet-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:12px;border:1px solid var(--bdr);border-radius:6px;overflow:hidden}
+.fstat{padding:10px 12px;border-right:1px solid var(--bdr);text-align:center}
+.fstat:last-child{border-right:none}
+.fstat-lbl{font-size:9px;color:var(--t2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.fstat-val{font-size:16px;font-weight:700}
+.vh-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.vh-name{font-size:14px;font-weight:700;color:var(--txt)}
+.vh-eng{font-size:11px;color:var(--t2)}
+.vh-mi{font-size:13px;font-weight:700;color:var(--amb);font-family:'Courier New',monospace}
+.vh-cost{font-size:10px;color:var(--t2)}
+.vh-last{font-size:10px;color:var(--t3);margin-top:3px}
+.filter-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:3px;margin-top:10px}
+.filter-btn{padding:5px 11px;border-radius:3px;border:1px solid var(--bdr);background:none;color:var(--t2);font-size:10px;white-space:nowrap;letter-spacing:.04em}
+.filter-btn.active{border-color:var(--amb);background:color-mix(in srgb,var(--amb) 8%,transparent);color:var(--amb)}
+.empty{color:var(--t2);font-size:13px;text-align:center;padding:24px}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--grn);display:inline-block;margin-left:6px;box-shadow:0 0 6px var(--grn)}
+.sync-dot.offline{background:var(--red);box-shadow:0 0 6px var(--red)}
+@media(max-width:400px){.fleet-stats{grid-template-columns:repeat(2,1fr)}.fstat:nth-child(2){border-right:none}.fstat:nth-child(3){border-top:1px solid var(--bdr)}.fstat:nth-child(4){border-top:1px solid var(--bdr);border-right:none}}
+</style>
+</head>
+<body>
+<div id="loading">
+  <div class="spinner"></div>
+  <div class="lbl">🏠 LOADING THE GARAGE…</div>
+</div>
+<div id="app" style="display:none;min-height:100vh"></div>
+
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import{getFirestore,collection,doc,setDoc,addDoc,updateDoc,onSnapshot,query,orderBy,getDocs,writeBatch}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+// ── Firebase ──────────────────────────────────────────────────────────────────
+const fbApp=initializeApp({
+  apiKey:"AIzaSyD4sExGNd-1dcrputWPtcqJGE3U0mKqi6k",
+  authDomain:"fleetmasterai.firebaseapp.com",
+  projectId:"fleetmasterai",
+  storageBucket:"fleetmasterai.firebasestorage.app",
+  messagingSenderId:"878453004926",
+  appId:"1:878453004926:web:4bc2332dd0237ea371562f"
+});
+const db=getFirestore(fbApp);
+const vcol=collection(db,'vehicles');
+const lcol=collection(db,'logs');
+
+// ── Link builder ──────────────────────────────────────────────────────────────
+const L=(store,q,price)=>({store,price,
+  url:store==='AutoZone'   ?`https://www.autozone.com/search?q=${encodeURIComponent(q)}`
+    :store==='Amazon'      ?`https://www.amazon.com/s?k=${encodeURIComponent(q)}`
+    :store==='RockAuto'    ?'https://www.rockauto.com'
+    :store==='Tire Rack'   ?'https://www.tirerack.com'
+    :store==='FCP Euro'    ?`https://www.fcpeuro.com/search?q=${encodeURIComponent(q)}`
+    :store==='ECS Tuning'  ?`https://www.ecstuning.com/Search/?search=${encodeURIComponent(q)}`
+    :store==='Advance'     ?`https://shop.advanceautoparts.com/find/q=${encodeURIComponent(q)}`
+    :store==='Walmart'     ?`https://www.walmart.com/search?q=${encodeURIComponent(q)}`
+    :store==="O'Reilly"    ?`https://www.oreillyauto.com/shop/b/search?q=${encodeURIComponent(q)}`
+    :store==='NAPA'        ?`https://www.napaonline.com/search?q=${encodeURIComponent(q)}`
+    :'#'
+});
+
+// Auto-generate extra store links for a part (Walmart, O'Reilly, NAPA, AutoZone)
+// skips any store already present in the existing links array
+function autoStoreLinks(brand,pn,existingLinks){
+  if(!pn||pn==='—'||pn==='-')return[];
+  const q=`${brand} ${pn}`.trim();
+  const have=new Set((existingLinks||[]).map(l=>l.store));
+  const extras=[];
+  if(!have.has('AutoZone'))  extras.push(L('AutoZone',q,null));
+  if(!have.has('Walmart'))   extras.push(L('Walmart',q,null));
+  if(!have.has("O'Reilly"))  extras.push(L("O'Reilly",pn,null));
+  if(!have.has('NAPA'))      extras.push(L('NAPA',q,null));
+  return extras;
+}
+
+// ── Service intervals ─────────────────────────────────────────────────────────
+const INTERVALS={
+  'Oil Change':{mi:5000,mo:6},'Air Filter':{mi:20000,mo:24},
+  'Cabin Air Filter':{mi:15000,mo:12},'Fuel Filter':{mi:20000,mo:24},
+  'Spark Plugs':{mi:60000,mo:48},'Timing Belt Kit':{mi:40000,mo:48},
+  'Tire Rotation':{mi:6000,mo:6},'Wheel Alignment':{mi:12000,mo:12},
+  'Transmission Service':{mi:30000,mo:36},'CVT Service':{mi:30000,mo:36},
+  'Coolant Flush':{mi:50000,mo:60},'Brake Fluid Flush':{mi:30000,mo:24},
+  'Serpentine Belt':{mi:60000,mo:60},'Battery Replacement':{mi:null,mo:48},
+  'Shocks / Struts':{mi:50000,mo:60},'Front Differential':{mi:30000,mo:36},
+  'Rear Differential':{mi:30000,mo:36},'Transfer Case Service':{mi:30000,mo:36},
+  'Power Steering Flush':{mi:30000,mo:36},'DSG / CVT Fluid':{mi:40000,mo:48},
+};
+
+const SERVICE_TYPES=[
+  'Oil Change','Air Filter','Cabin Air Filter','Fuel Filter','Glow Plugs','Spark Plugs',
+  'Ignition Coils','PCV Valve','Throttle Body Service','Timing Belt Kit','Timing Chain Service',
+  'Brake Pads – Front','Brake Pads – Rear','Brake Rotors – Front','Brake Rotors – Rear',
+  'Brake Shoes – Rear','Brake Drums – Rear','Brake Fluid Flush','Brake Calipers',
+  'Tire Rotation','Tire Balance','New Tires Installed','Wheel Alignment','TPMS Service',
+  'Transmission Service','CVT Service','Transfer Case Service','DSG / CVT Fluid',
+  'Front Differential','Rear Differential','4WD Service',
+  'Coolant Flush','Thermostat','Water Pump','Radiator Hoses','Radiator',
+  'Serpentine Belt','Idler/Tensioner Pulley','Battery Replacement','Battery Test',
+  'Alternator','Starter','Power Steering Flush','Power Steering Pump','Rack & Pinion',
+  'Fuel Injectors','Fuel Pump','Fuel Tank/Lines',
+  'Front Suspension','Rear Suspension','Shocks / Struts','Control Arm Replacement',
+  'Ball Joints','Tie Rod Ends','CV Axle / Boot','U-Joint','Sway Bar Links',
+  'Wheel Bearing / Hub','AC Recharge','AC Compressor','Blower Motor',
+  'Catalytic Converter','O2 / Lambda Sensor','EGR Service','DPF Service',
+  'Turbocharger Service','Turbo Rebuild','Intercooler',
+  'Engine Replacement','Engine Rebuild','Head Gasket','Carbon Cleaning (DI)',
+  'Valve Cover Gasket','Exhaust Repair','Muffler',
+  'Windshield Wipers','Headlights','Taillights','Bulb Replacement',
+  'Windshield / Glass','Touch-up Paint','Wash / Detail',
+  'State Inspection','Emissions Test','Pre-Trip Inspection','Other',
+];
+
+// ── Seed vehicle data ─────────────────────────────────────────────────────────
+const SEED_VEHICLES=[
+{id:'v1',nickname:'#1 – 2008 F-150 Limited',year:2008,make:'Ford',model:'F-150',trim:'Limited',
+ engine:'5.4L 3V Triton V8',vin:'1FTRW12578FA49354',plate:'',color:'',
+ currentMileage:180000,fuelType:'Gasoline',driveType:'4WD',
+ notes:'⚠️ SPARK PLUG WARNING: 2-piece 3V Triton design — extreme breakage risk above 100k mi. Warm engine 10 min, apply penetrating oil night before, remove slowly with care. Consider Ford Performance 1-piece replacements (M-12405-5P4B) to permanently eliminate this risk.',
+ specs:{hp:'300 hp @ 5000 rpm',torque:'365 lb-ft @ 3750 rpm',trans:'4R75E 4-Spd or 6R60 6-Spd',drive:'4WD',fuelCap:'26.0 gal',oilCap:'6.0 qt',oilType:'5W-20 Full Synthetic',coolantCap:'~24 qt',tireSize:'P275/55R20',battGrp:'Group 65',tirePSI:'35 F / 35 R',sparkPlugGap:'0.054 in',towCap:'~11,000 lbs'},
+ parts:{
+   oilFilters:[
+     {brand:'Motorcraft',pn:'FL-820-S',notes:'OEM — 6 qt 5W-20',links:[L('AutoZone','Motorcraft FL-820-S','$8.99'),L('Amazon','Motorcraft FL-820-S','~$7.50'),L('RockAuto','FL-820-S F150',null)]},
+     {brand:'Mobil 1 Extended',pn:'M1-110A',notes:'Up to 15,000 mi',links:[L('Amazon','Mobil 1 M1-110A oil filter','~$12.99')]},
+     {brand:'Wix',pn:'57060',notes:'Budget option',links:[L('Amazon','Wix 57060 oil filter','~$5.99')]},
+   ],
+   airFilters:[
+     {brand:'Motorcraft',pn:'FA-1685',notes:'OEM',links:[L('AutoZone','Motorcraft FA-1685','$22.99'),L('Amazon','Motorcraft FA-1685','~$18.99')]},
+     {brand:'K&N',pn:'33-2171',notes:'Washable/reusable hi-flow',links:[L('Amazon','K&N 33-2171 F150 air filter','~$59.99')]},
+   ],
+   cabinFilters:[
+     {brand:'Motorcraft',pn:'FP-39',notes:'OEM — located under hood near firewall',links:[L('AutoZone','Motorcraft FP-39 cabin filter','$16.99'),L('Amazon','Motorcraft FP-39','~$14.99')]},
+   ],
+   sparkPlugs:[
+     {brand:'Motorcraft',pn:'SP-479',notes:'⚠️ 2-PIECE — see vehicle notes for removal procedure. × 8 req\'d.',links:[L('AutoZone','Motorcraft SP-479 5.4 triton','$8.99/ea'),L('Amazon','Motorcraft SP479','~$7.50/ea')]},
+     {brand:'Ford Performance 1-piece',pn:'M-12405-5P4B',notes:'Permanent fix — no breakage risk. × 8 req\'d.',links:[L('Amazon','Ford Performance M-12405-5P4B 5.4 1-piece spark plug','~$18/ea')]},
+   ],
+   brakes:{
+     frontPads:[{brand:'Motorcraft',pn:'BR-3254A',notes:'OEM ceramic',links:[L('AutoZone','Motorcraft BR-3254A','$54.99'),L('Amazon','Motorcraft BR-3254A','~$44.99')]}],
+     rearPads:[{brand:'Motorcraft',pn:'BR-3255A',notes:'OEM ceramic',links:[L('AutoZone','Motorcraft BR-3255A','$49.99'),L('Amazon','Motorcraft BR-3255A','~$39.99')]}],
+     rearShoes:[],rearDrums:[],
+     frontRotors:[
+       {brand:'Motorcraft',pn:'BRR-352',notes:'OEM',links:[L('AutoZone','Motorcraft BRR-352','$89.99'),L('RockAuto','F150 front rotor 2008',null)]},
+       {brand:'Power Stop Z36',pn:'AR85143XPR',notes:'Drilled & slotted upgrade',links:[L('Amazon','Power Stop AR85143XPR F150 rotor','~$74.99')]},
+     ],
+     rearRotors:[{brand:'Motorcraft',pn:'BRR-278',notes:'OEM',links:[L('AutoZone','Motorcraft BRR-278','$79.99'),L('RockAuto','F150 rear rotor 2008',null)]}],
+   },
+   battery:[
+     {brand:'Motorcraft',pn:'BXT-65-850',notes:'OEM Group 65 — 850 CCA',links:[L('AutoZone','Motorcraft BXT-65-850','$179.99'),L('Amazon','Group 65 Ford battery','~$159.99')]},
+   ],
+   tires:{size:'P275/55R20',psi:'35 F / 35 R',notes:'',options:[
+     {brand:'Michelin Defender LTX M/S',links:[L('Tire Rack','Michelin Defender LTX 275/55R20','~$229/ea')]},
+     {brand:'BFGoodrich KO2 All-Terrain',links:[L('Tire Rack','BFGoodrich KO2 275/55R20','~$219/ea')]},
+     {brand:'Goodyear Wrangler SR-A',links:[L('Tire Rack','Goodyear Wrangler SRA 275/55R20','~$189/ea')]},
+   ]},
+   transmissionFluid:[{brand:'Motorcraft MERCON V',pn:'XT-5-QM',notes:'4R75E ~12 qt total / ~6 qt drain-fill. 6R60: use MERCON LV.',links:[L('AutoZone','Motorcraft MERCON V XT-5-QM','$10.99/qt'),L('Amazon','Motorcraft MERCON V','~$9.99/qt')]}],
+   coolant:[{brand:'Motorcraft Orange OAT',pn:'VC-3DIL-B',notes:'Pre-diluted 50/50. Do NOT mix with green IIIG coolant.',links:[L('AutoZone','Motorcraft VC-3DIL-B orange coolant','$18.99/gal'),L('Amazon','Motorcraft VC-3DIL-B','~$16.99/gal')]}],
+   differentialFluid:[{brand:'Motorcraft 80W-90 GL-5',pn:'XY-80W90-QL',notes:'Front + rear axles ~2.75 pt ea. LS friction modifier if LS axle.',links:[L('AutoZone','Motorcraft XY-80W90-QL','$12.99/qt'),L('Amazon','Motorcraft 80W-90 GL-5','~$11.99/qt')]}],
+ }},
+{id:'v2',nickname:'#2 – 2009 F-150 Lariat',year:2009,make:'Ford',model:'F-150',trim:'Lariat',
+ engine:'5.4L 3V Triton V8 — NEW ENGINE @ 100k mi',vin:'',plate:'',color:'',
+ currentMileage:110000,fuelType:'Gasoline',driveType:'',
+ notes:'NEW OEM 5.4L engine installed at 100,000 chassis miles. Engine mileage ~10,000 mi. ⚠️ Same 2-piece spark plug risk applies — verify removal procedure before starting. Confirm 4WD or RWD to determine correct trans fluid.',
+ specs:{hp:'300 hp @ 5000 rpm',torque:'365 lb-ft @ 3750 rpm',trans:'4R75E or 6R80 — verify',drive:'TBD — confirm 4WD or RWD',fuelCap:'26.0 gal',oilCap:'6.0 qt',oilType:'5W-20 Full Synthetic',coolantCap:'~24 qt',tireSize:'P265/70R17 or P275/55R20',battGrp:'Group 65',tirePSI:'35 F / 35 R',sparkPlugGap:'0.054 in',towCap:'~11,000 lbs'},
+ parts:{
+   oilFilters:[
+     {brand:'Motorcraft',pn:'FL-820-S',notes:'OEM — 6 qt 5W-20 (same as #1)',links:[L('AutoZone','Motorcraft FL-820-S','$8.99'),L('Amazon','Motorcraft FL-820-S','~$7.50')]},
+     {brand:'Wix',pn:'57060',notes:'Budget option',links:[L('Amazon','Wix 57060','~$5.99')]},
+   ],
+   airFilters:[{brand:'Motorcraft',pn:'FA-1885',notes:'OEM 2009 5.4L',links:[L('AutoZone','Motorcraft FA-1885 F150 5.4','$22.99'),L('Amazon','Motorcraft FA-1885','~$18.99')]}],
+   cabinFilters:[{brand:'Motorcraft',pn:'FP-39',notes:'OEM pollen filter',links:[L('AutoZone','Motorcraft FP-39 cabin','$16.99'),L('Amazon','Motorcraft FP-39','~$14.99')]}],
+   sparkPlugs:[
+     {brand:'Motorcraft',pn:'SP-479',notes:'⚠️ 2-PIECE — follow removal procedure. × 8 req\'d.',links:[L('AutoZone','Motorcraft SP-479','$8.99/ea'),L('Amazon','Motorcraft SP479','~$7.50/ea')]},
+     {brand:'Ford Performance 1-piece',pn:'M-12405-5P4B',notes:'Eliminates breakage risk. × 8 req\'d.',links:[L('Amazon','Ford Performance M-12405-5P4B 5.4 triton 1-piece','~$18/ea')]},
+   ],
+   brakes:{
+     frontPads:[{brand:'Motorcraft',pn:'BR-3254A',notes:'OEM',links:[L('AutoZone','Motorcraft BR-3254A','$54.99')]}],
+     rearPads:[{brand:'Motorcraft',pn:'BR-3255A',notes:'OEM',links:[L('AutoZone','Motorcraft BR-3255A','$49.99')]}],
+     rearShoes:[],rearDrums:[],
+     frontRotors:[{brand:'Motorcraft',pn:'BRR-352',notes:'OEM',links:[L('AutoZone','Motorcraft BRR-352','$89.99'),L('RockAuto','2009 F150 front rotor',null)]}],
+     rearRotors:[{brand:'Motorcraft',pn:'BRR-278',notes:'OEM',links:[L('AutoZone','Motorcraft BRR-278','$79.99')]}],
+   },
+   battery:[{brand:'Motorcraft',pn:'BXT-65-850',notes:'OEM Group 65 — 850 CCA',links:[L('AutoZone','Motorcraft BXT-65-850','$179.99')]}],
+   tires:{size:'P265/70R17',psi:'35 F / 35 R',notes:'',options:[
+     {brand:'Michelin LTX M/S2',links:[L('Tire Rack','Michelin LTX MS2 265/70R17','~$199/ea')]},
+     {brand:'BFGoodrich KO2 All-Terrain',links:[L('Tire Rack','BFGoodrich KO2 265/70R17','~$219/ea')]},
+   ]},
+   transmissionFluid:[{brand:'Motorcraft MERCON V',pn:'XT-5-QM',notes:'4R75E — ~12 qt total. Use MERCON LV for 6R80.',links:[L('AutoZone','Motorcraft MERCON V','$10.99/qt')]}],
+   coolant:[{brand:'Motorcraft Orange OAT',pn:'VC-3DIL-B',notes:'Pre-diluted 50/50',links:[L('AutoZone','Motorcraft VC-3DIL-B','$18.99/gal')]}],
+   differentialFluid:[{brand:'Motorcraft 80W-90 GL-5',pn:'XY-80W90-QL',notes:'Front + rear axles. Add LS friction modifier if needed.',links:[L('AutoZone','Motorcraft XY-80W90-QL','$12.99/qt')]}],
+ }},
+{id:'v3',nickname:'#3 – 2013 VW Passat TDI',year:2013,make:'Volkswagen',model:'Passat',trim:'TDI SE',
+ engine:'2.0L TDI DOHC 4-cyl Diesel (CKRA)',vin:'1VWCN7A32DC019408',plate:'',color:'',
+ currentMileage:85000,fuelType:'Diesel',driveType:'FWD',
+ notes:'⚠️ THREE CRITICAL ITEMS:\n1. VW 507.00 oil spec MANDATORY — standard oil damages the DPF filter\n2. Timing belt EVERY 40k mi — interference engine, failure = total engine loss\n3. Verify VW Dieselgate recall/ECU fix has been applied (US Passat TDI)',
+ specs:{hp:'140 hp @ 4000 rpm',torque:'236 lb-ft @ 1750–2500 rpm',trans:'6-Spd DSG (DQ250) or 6-Spd Manual',drive:'FWD',fuelCap:'18.5 gal (Diesel)',oilCap:'4.3 qt (w/filter)',oilType:'5W-30 VW 507.00 SPEC — MANDATORY',coolantCap:'~8 qt',tireSize:'P225/55R16 or 225/45R17',battGrp:'H6 / Group 48',tirePSI:'36 F / 33 R',sparkPlugGap:'N/A — Diesel (has Glow Plugs)',towCap:'~2,200 lbs'},
+ parts:{
+   oilFilters:[
+     {brand:'Mann Filter',pn:'HU 816 x',notes:'OEM supplier — use ONLY VW 507.00 spec oil. 4.3 qt.',links:[L('Amazon','Mann HU816x VW Passat TDI oil filter','~$12.99'),L('FCP Euro','Mann HU816x VW','~$11.99'),L('ECS Tuning','03N115562 VW TDI oil filter','~$14.99')]},
+     {brand:'VW/Audi OEM',pn:'03N115562',notes:'Genuine VW part — preferred',links:[L('FCP Euro','03N115562 VW genuine oil filter','~$13.99'),L('Amazon','03N115562 VW oil filter TDI','~$12.49')]},
+   ],
+   airFilters:[
+     {brand:'Mahle',pn:'LX 1850',notes:'OEM supplier quality',links:[L('Amazon','Mahle LX1850 VW Passat TDI air filter','~$18.99'),L('FCP Euro','LX 1850 Passat TDI','~$16.99')]},
+     {brand:'VW OEM',pn:'3C0129620B',notes:'Genuine VW air filter',links:[L('ECS Tuning','3C0129620B VW air filter Passat','~$22.99'),L('FCP Euro','3C0129620B','~$24.99')]},
+   ],
+   cabinFilters:[{brand:'Mahle',pn:'LA 388',notes:'Cabin/pollen filter',links:[L('Amazon','Mahle LA388 VW Passat cabin filter','~$16.99'),L('FCP Euro','LA 388 Passat','~$14.99')]}],
+   sparkPlugs:[{brand:'N/A — DIESEL',pn:'—',notes:'No spark plugs. See Glow Plugs.',links:[]}],
+   glowPlugs:[
+     {brand:'Bosch',pn:'0 250 202 131',notes:'OEM spec — × 4 req\'d',links:[L('Amazon','Bosch 0250202131 VW TDI glow plugs','~$12.99/ea'),L('FCP Euro','0250202131 glow plug TDI','~$11.99/ea')]},
+     {brand:'NGK',pn:'Y-703R',notes:'Alternative — × 4 req\'d',links:[L('Amazon','NGK Y-703R glow plug VW TDI Passat','~$11.99/ea')]},
+   ],
+   timingBelt:[
+     {brand:'VW OEM Kit',pn:'03L198119B',notes:'⚠️ CRITICAL — 40k mi interval. Includes belt + water pump + tensioner. Interference engine — failure = engine destruction.',links:[L('FCP Euro','03L198119B timing belt kit Passat TDI','~$189.99'),L('ECS Tuning','03L198119B VW TDI timing kit','~$199.99'),L('Amazon','VW Passat TDI timing belt kit 03L198119B','~$179.99')]},
+     {brand:'Gates',pn:'TCK328B',notes:'High-quality aftermarket full kit',links:[L('Amazon','Gates TCK328B VW TDI timing kit','~$149.99'),L('RockAuto','Gates TCK328B',null)]},
+   ],
+   fuelFilter:[
+     {brand:'Mann Filter',pn:'WK 842/2',notes:'Diesel fuel filter — every 20k mi',links:[L('Amazon','Mann WK842/2 VW Passat TDI fuel filter','~$24.99'),L('FCP Euro','WK 842/2 Passat TDI','~$22.99')]},
+   ],
+   brakes:{
+     frontPads:[{brand:'ATE',pn:'604366280',notes:'OEM supplier — ceramic',links:[L('FCP Euro','ATE VW Passat NMS front brake pads','~$39.99'),L('Amazon','ATE VW Passat NMS front pads','~$42.99')]}],
+     rearPads:[{brand:'ATE',pn:'606720',notes:'OEM supplier rear pads',links:[L('FCP Euro','ATE VW Passat NMS rear pads','~$34.99'),L('Amazon','ATE VW Passat rear brake pads','~$37.99')]}],
+     rearShoes:[],rearDrums:[],
+     frontRotors:[{brand:'Zimmermann',pn:'100.3302.20',notes:'Zinc-coated sport finish',links:[L('FCP Euro','Zimmermann VW Passat front rotor','~$54.99'),L('Amazon','Zimmermann Passat NMS front rotor','~$59.99')]}],
+     rearRotors:[{brand:'Zimmermann',pn:'100.3303.20',notes:'Rear rotor',links:[L('FCP Euro','Zimmermann VW Passat rear rotor','~$49.99')]}],
+   },
+   battery:[{brand:'Bosch AGM',pn:'H6 / Group 48',notes:'70Ah AGM — preferred for DSG / stop-start. 700+ CCA.',links:[L('AutoZone','H6 AGM battery Group 48 VW','$199.99'),L('Amazon','H6 Group 48 AGM battery Bosch','~$179.99')]}],
+   tires:{size:'P225/55R16',psi:'36 F / 33 R',notes:'',options:[
+     {brand:'Michelin Primacy MXM4',links:[L('Tire Rack','Michelin Primacy MXM4 225/55R16','~$179/ea')]},
+     {brand:'Continental PureContact LS',links:[L('Tire Rack','Continental PureContact LS 225/55R16','~$159/ea')]},
+   ]},
+   transmissionFluid:[{brand:'VW DSG Fluid',pn:'G 052 182 A2',notes:'6-spd DQ250 DSG — every 40k mi. CRITICAL: use correct fluid only.',links:[L('FCP Euro','VW DSG fluid G052182A2','~$15.99/L'),L('Amazon','VW G052182A2 DSG fluid','~$17.99/L')]}],
+   coolant:[{brand:'VW G12++ OAT (Pink)',pn:'G 012 A8G A1',notes:'Pink OAT — do NOT mix with other types.',links:[L('FCP Euro','VW G12++ coolant G012A8GA1','~$18.99/L'),L('Amazon','VW G12 plus plus coolant','~$16.99/L')]}],
+   differentialFluid:[],
+ }},
+{id:'v4',nickname:'#4 – 2014 Fusion Titanium',year:2014,make:'Ford',model:'Fusion',trim:'Titanium',
+ engine:'2.0L EcoBoost I4 Turbocharged',vin:'3FA6P0D91ER329091',plate:'',color:'',
+ currentMileage:140000,fuelType:'Gasoline',driveType:'FWD',
+ notes:'EcoBoost direct injection — carbon buildup on intake valves. Walnut blast cleaning recommended every 40–60k mi (symptoms: rough idle, reduced power).\n⚠️ 6F35 trans: ONLY use MERCON LV — never MERCON V or MERCON SP, risk of trans damage.',
+ specs:{hp:'240 hp @ 5500 rpm',torque:'270 lb-ft @ 3000 rpm',trans:'6F35 6-Spd SelectShift',drive:'FWD',fuelCap:'16.5 gal',oilCap:'5.7 qt',oilType:'5W-30 Full Synthetic',coolantCap:'~12 qt',tireSize:'235/45R18',battGrp:'Group 96R',tirePSI:'35 F / 35 R',sparkPlugGap:'0.034 in',towCap:'2,000 lbs'},
+ parts:{
+   oilFilters:[
+     {brand:'Motorcraft',pn:'FL-910S',notes:'OEM — 5.7 qt 5W-30',links:[L('AutoZone','Motorcraft FL-910S Fusion EcoBoost','$9.99'),L('Amazon','Motorcraft FL910S','~$8.49')]},
+     {brand:'Wix',pn:'57502',notes:'Alternative',links:[L('Amazon','Wix 57502 Fusion EcoBoost','~$6.99'),L('RockAuto','Wix 57502',null)]},
+   ],
+   airFilters:[{brand:'Motorcraft',pn:'FA-1871',notes:'OEM EcoBoost 2.0',links:[L('AutoZone','Motorcraft FA-1871 Fusion EcoBoost','$21.99'),L('Amazon','Motorcraft FA-1871','~$17.99')]}],
+   cabinFilters:[{brand:'Motorcraft',pn:'FP-62',notes:'OEM cabin/pollen filter',links:[L('AutoZone','Motorcraft FP-62 Fusion cabin filter','$18.99'),L('Amazon','Motorcraft FP62','~$15.99')]}],
+   sparkPlugs:[
+     {brand:'Motorcraft',pn:'SP-547',notes:'OEM iridium — 4 req\'d. Gap: 0.034 in',links:[L('AutoZone','Motorcraft SP-547 Fusion EcoBoost','$14.99/ea'),L('Amazon','Motorcraft SP547','~$12.99/ea')]},
+     {brand:'NGK Laser Iridium',pn:'ILTR5A13G',notes:'Upgrade — 4 req\'d',links:[L('Amazon','NGK ILTR5A13G Ford Fusion 2.0 EcoBoost','~$11.99/ea')]},
+   ],
+   brakes:{
+     frontPads:[
+       {brand:'Motorcraft',pn:'BR-5389A',notes:'OEM ceramic',links:[L('AutoZone','Motorcraft BR-5389A Fusion','$52.99'),L('Amazon','Motorcraft BR5389A','~$44.99')]},
+       {brand:'Wagner ThermoQuiet',pn:'QC1389',notes:'Quiet upgrade',links:[L('Amazon','Wagner QC1389 Ford Fusion front pads','~$38.99')]},
+     ],
+     rearPads:[{brand:'Motorcraft',pn:'BR-5390A',notes:'OEM rear',links:[L('AutoZone','Motorcraft BR-5390A Fusion rear','$47.99'),L('Amazon','Motorcraft BR5390A','~$39.99')]}],
+     rearShoes:[],rearDrums:[],
+     frontRotors:[{brand:'Motorcraft',pn:'BRR-312',notes:'OEM',links:[L('AutoZone','Motorcraft BRR-312 Fusion','$79.99'),L('RockAuto','2014 Fusion front rotor',null)]}],
+     rearRotors:[{brand:'Motorcraft',pn:'BRR-313',notes:'OEM rear',links:[L('AutoZone','Motorcraft BRR-313 Fusion rear rotor','$69.99')]}],
+   },
+   battery:[{brand:'Motorcraft / DieHard',pn:'Group 96R',notes:'490–590 CCA',links:[L('AutoZone','Group 96R battery Ford Fusion','$149.99'),L('Amazon','Group 96R car battery','~$139.99')]}],
+   tires:{size:'235/45R18',psi:'35 F / 35 R',notes:'',options:[
+     {brand:'Michelin Premier A/S',links:[L('Tire Rack','Michelin Premier AS 235/45R18','~$199/ea')]},
+     {brand:'Continental TrueContact Tour',links:[L('Tire Rack','Continental TrueContact Tour 235/45R18','~$169/ea')]},
+   ]},
+   transmissionFluid:[{brand:'Motorcraft MERCON LV',pn:'XT-10-QLVC',notes:'⚠️ 6F35 ONLY — NEVER MERCON V or SP. Risk of trans damage.',links:[L('AutoZone','Motorcraft MERCON LV XT-10-QLVC','$11.99/qt'),L('Amazon','Motorcraft MERCON LV','~$10.99/qt')]}],
+   coolant:[{brand:'Motorcraft Orange OAT',pn:'VC-3DIL-B',notes:'Pre-diluted 50/50',links:[L('AutoZone','Motorcraft VC-3DIL-B Fusion','$18.99/gal')]}],
+   differentialFluid:[],
+ }},
+{id:'v5',nickname:'#5 – 2016 Lincoln Navigator',year:2016,make:'Lincoln',model:'Navigator',trim:'Base/Select',
+ engine:'3.5L EcoBoost V6 Twin-Turbo',vin:'5LMJJ2JT0GEL00925',plate:'',color:'',
+ currentMileage:185000,fuelType:'Gasoline',driveType:'4WD',
+ notes:'TURBOS REBUILT + new catalytic converters at 160,000 mi.\nMonitor oil level closely — EcoBoost at 185k may consume oil between changes. Check intercooler boot connections (common leak point at this mileage). Direct injection: carbon cleaning recommended.',
+ specs:{hp:'380 hp @ 5000 rpm',torque:'460 lb-ft @ 2500 rpm',trans:'6R80 6-Spd SelectShift',drive:'4WD',fuelCap:'22.5 gal',oilCap:'6.0 qt',oilType:'5W-30 Full Synthetic',coolantCap:'~26 qt',tireSize:'275/50R22',battGrp:'Group 65',tirePSI:'37 F / 37 R',sparkPlugGap:'0.030 in',towCap:'9,000 lbs'},
+ parts:{
+   oilFilters:[
+     {brand:'Motorcraft',pn:'FL-910S',notes:'OEM 3.5L EcoBoost — 6 qt 5W-30',links:[L('AutoZone','Motorcraft FL-910S Navigator EcoBoost','$9.99'),L('Amazon','Motorcraft FL910S','~$8.49')]},
+     {brand:'Mobil 1 Extended',pn:'M1-212A',notes:'Extended drain option',links:[L('Amazon','Mobil 1 M1-212A extended filter','~$13.99'),L('Walmart','Mobil 1 M1-212A','~$12.49')]},
+   ],
+   airFilters:[{brand:'Motorcraft',pn:'FA-1884',notes:'OEM Navigator 3.5L EcoBoost',links:[L('AutoZone','Motorcraft FA-1884 Navigator','$24.99'),L('Amazon','Motorcraft FA-1884','~$19.99')]}],
+   cabinFilters:[{brand:'Motorcraft',pn:'FP-76',notes:'OEM Navigator cabin filter',links:[L('AutoZone','Motorcraft FP-76 Navigator cabin filter','$22.99'),L('Amazon','Motorcraft FP76','~$18.99')]}],
+   sparkPlugs:[
+     {brand:'Motorcraft',pn:'SP-534',notes:'OEM iridium — 6 req\'d. Gap: 0.030 in',links:[L('AutoZone','Motorcraft SP-534 3.5 EcoBoost Navigator','$9.99/ea'),L('Amazon','Motorcraft SP534','~$8.99/ea')]},
+     {brand:'NGK Laser Iridium',pn:'ILZKR7B-11S',notes:'Upgrade — 6 req\'d',links:[L('Amazon','NGK ILZKR7B-11S 3.5 EcoBoost Navigator','~$12.99/ea')]},
+   ],
+   brakes:{
+     frontPads:[{brand:'Motorcraft',pn:'BR-3328A',notes:'OEM ceramic — large Navigator front',links:[L('AutoZone','Motorcraft BR-3328A Navigator front','$59.99'),L('Amazon','Motorcraft BR3328A','~$49.99')]}],
+     rearPads:[{brand:'Motorcraft',pn:'BR-3329A',notes:'OEM rear',links:[L('AutoZone','Motorcraft BR-3329A Navigator rear','$54.99'),L('Amazon','Motorcraft BR3329A','~$44.99')]}],
+     rearShoes:[],rearDrums:[],
+     frontRotors:[{brand:'Motorcraft',pn:'BRR-369',notes:'OEM large front rotor',links:[L('AutoZone','Motorcraft BRR-369 Navigator front rotor','$119.99'),L('RockAuto','2016 Navigator front rotor',null)]}],
+     rearRotors:[{brand:'Motorcraft',pn:'BRR-370',notes:'OEM rear',links:[L('AutoZone','Motorcraft BRR-370 Navigator rear rotor','$99.99'),L('RockAuto','2016 Navigator rear rotor',null)]}],
+   },
+   battery:[{brand:'Motorcraft',pn:'BXT-65-850',notes:'OEM Group 65 — 850 CCA',links:[L('AutoZone','Motorcraft BXT-65-850','$179.99'),L('Amazon','Group 65 850 CCA battery Ford','~$159.99')]}],
+   tires:{size:'275/50R22',psi:'37 F / 37 R',notes:'',options:[
+     {brand:'Michelin Defender LTX M/S',links:[L('Tire Rack','Michelin Defender LTX 275/50R22','~$299/ea')]},
+     {brand:'Continental CrossContact LX Sport',links:[L('Tire Rack','Continental CrossContact LX Sport 275/50R22','~$269/ea')]},
+     {brand:'Pirelli Scorpion ATR',links:[L('Tire Rack','Pirelli Scorpion ATR 275/50R22','~$249/ea')]},
+   ]},
+   transmissionFluid:[{brand:'Motorcraft MERCON LV',pn:'XT-10-QLVC',notes:'6R80 — 13 qt total / ~6 qt service fill',links:[L('AutoZone','Motorcraft MERCON LV XT-10-QLVC','$11.99/qt'),L('Amazon','Motorcraft MERCON LV','~$10.99/qt')]}],
+   coolant:[{brand:'Motorcraft Orange OAT',pn:'VC-3DIL-B',notes:'Pre-diluted 50/50',links:[L('AutoZone','Motorcraft VC-3DIL-B Navigator coolant','$18.99/gal')]}],
+   differentialFluid:[{brand:'Motorcraft 75W-140',pn:'XY-75W140-QL',notes:'Front + rear axles — LS friction modifier included',links:[L('AutoZone','Motorcraft 75W-140 XY-75W140-QL','$16.99/qt'),L('Amazon','Motorcraft XY-75W140-QL','~$15.99/qt')]}],
+ }},
+{id:'v6',nickname:'#6 – 2012 Kia Sedona LX',year:2012,make:'Kia',model:'Sedona',trim:'LX',
+ engine:'3.5L Lambda V6 DOHC',vin:'',plate:'',color:'',
+ currentMileage:180000,fuelType:'Gasoline',driveType:'FWD',
+ notes:'New Yokohama tires recently installed — log install date + mileage.\n⚠️ Hyundai/Kia PINK OAT coolant ONLY — do NOT use green or orange DEX-COOL.\nVerify timing belt history — 3.5L Lambda is an interference engine.',
+ specs:{hp:'271 hp @ 6000 rpm',torque:'248 lb-ft @ 4500 rpm',trans:'6-Speed Auto (A6MF1)',drive:'FWD',fuelCap:'21.1 gal',oilCap:'5.3 qt',oilType:'5W-20 or 5W-30 Full Synthetic',coolantCap:'~10.4 qt',tireSize:'P235/65R16',battGrp:'Group 35',tirePSI:'35 F / 35 R',sparkPlugGap:'0.039–0.043 in',towCap:'3,500 lbs'},
+ parts:{
+   oilFilters:[
+     {brand:'Kia/Hyundai OEM',pn:'26300-35502',notes:'OEM — 5.3 qt 5W-20',links:[L('Amazon','26300-35502 Kia Sedona oil filter','~$8.99'),L('AutoZone','Kia Sedona 3.5 oil filter','$9.99')]},
+     {brand:'Purolator',pn:'PL14670',notes:'Premium alternative',links:[L('AutoZone','Purolator PL14670','$7.99'),L('Amazon','Purolator PL14670','~$6.99')]},
+     {brand:'Wix',pn:'51372',notes:'Budget option',links:[L('Amazon','Wix 51372 Kia Sedona 3.5','~$5.99')]},
+   ],
+   airFilters:[
+     {brand:'Purolator',pn:'A25468',notes:'OEM-quality',links:[L('AutoZone','Purolator A25468 Kia Sedona','$18.99'),L('Amazon','Purolator A25468','~$15.99')]},
+     {brand:'K&N',pn:'33-2304',notes:'Washable/reusable hi-flow',links:[L('Amazon','K&N 33-2304 Kia Sedona air filter','~$59.99')]},
+   ],
+   cabinFilters:[{brand:'Purolator',pn:'C35519',notes:'Cabin/pollen filter',links:[L('AutoZone','Purolator C35519 Kia Sedona cabin filter','$17.99'),L('Amazon','Purolator C35519','~$14.99')]}],
+   sparkPlugs:[
+     {brand:'NGK Iridium IX',pn:'IZFR6K11',notes:'OEM spec — × 6 req\'d',links:[L('AutoZone','NGK IZFR6K11 Kia Sedona 3.5','$14.99/ea'),L('Amazon','NGK 3764 IZFR6K11','~$12.99/ea')]},
+     {brand:'Denso Iridium TT',pn:'SK16R11',notes:'Upgrade — × 6 req\'d',links:[L('Amazon','Denso SK16R11 Kia Sedona 3.5','~$13.99/ea')]},
+   ],
+   brakes:{
+     frontPads:[
+       {brand:'Akebono',pn:'ASP1015',notes:'Ultra-premium ceramic',links:[L('Amazon','Akebono ASP1015 Kia Sedona front pads','~$54.99'),L('Advance','Akebono ASP1015','~$58.99')]},
+       {brand:'KIA OEM',pn:'58101-4DA00',notes:'Genuine front pads',links:[L('Amazon','58101-4DA00 Kia Sedona front brake pads','~$49.99')]},
+     ],
+     rearPads:[{brand:'Akebono',pn:'ASP971A',notes:'Ultra-premium ceramic rear',links:[L('Amazon','Akebono ASP971A Kia Sedona rear pads','~$49.99')]}],
+     rearShoes:[],rearDrums:[],
+     frontRotors:[{brand:'PowerStop',pn:'AR82153',notes:'Coated OEM replacement',links:[L('Amazon','PowerStop AR82153 Kia Sedona front rotor','~$44.99'),L('RockAuto','Kia Sedona 3.5 front rotor',null)]}],
+     rearRotors:[{brand:'PowerStop',pn:'AR82154',notes:'Coated rear',links:[L('Amazon','PowerStop AR82154 Kia Sedona rear rotor','~$39.99')]}],
+   },
+   battery:[{brand:'DieHard Gold',pn:'Group 35',notes:'450–550 CCA',links:[L('AutoZone','DieHard Gold Group 35 battery','$149.99'),L('Amazon','Group 35 car battery','~$139.99')]}],
+   tires:{size:'P235/65R16',psi:'35 F / 35 R',notes:'Yokohama recently installed — log install date + mileage.',options:[
+     {brand:'Yokohama Avid GT (installed)',links:[L('Tire Rack','Yokohama Avid GT 235/65R16','~$149/ea')]},
+     {brand:'Michelin Premier LTX',links:[L('Tire Rack','Michelin Premier LTX 235/65R16','~$179/ea')]},
+     {brand:'Continental CrossContact LX20',links:[L('Tire Rack','Continental CrossContact LX20 235/65R16','~$159/ea')]},
+   ]},
+   transmissionFluid:[{brand:'Kia/Hyundai SP-IV',pn:'00232-19048',notes:'A6MF1 6-speed — ~7 qt total',links:[L('Amazon','Hyundai Kia SP-IV ATF 00232-19048','~$15.99/qt')]}],
+   coolant:[{brand:'Kia/Hyundai OAT (Pink)',pn:'00232-19011',notes:'⚠️ PINK OAT ONLY — never DEX-COOL, green IIIG, or VW G12.',links:[L('Amazon','Hyundai Kia OAT pink coolant 00232-19011','~$16.99/gal')]}],
+   differentialFluid:[],
+ }},
+{id:'v7',nickname:'#7 – 2008 Jeep Patriot Sport',year:2008,make:'Jeep',model:'Patriot',trim:'Sport',
+ engine:'2.0L DOHC World Engine I4',vin:'',plate:'',color:'',
+ currentMileage:170000,fuelType:'Gasoline',driveType:'FWD',
+ notes:'NEW front lower control arms installed — log install date.\n⚠️ CVT uses Mopar NS-2 fluid ONLY — standard ATF will destroy CVT.\n⚠️ REAR BRAKES ARE DRUMS (not disc) on FWD Sport trim.\nVerify trans type (CVT vs 5-spd manual) — check selector lever.',
+ specs:{hp:'158 hp @ 6300 rpm',torque:'141 lb-ft @ 5100 rpm',trans:'CVT (AutoStick) or 5-Spd Manual — verify',drive:'FWD',fuelCap:'13.6 gal',oilCap:'4.5 qt',oilType:'5W-30 Full Synthetic',coolantCap:'~10 qt',tireSize:'P205/70R16 or P215/65R16',battGrp:'Group 34/78',tirePSI:'32 F / 32 R',sparkPlugGap:'0.044 in',towCap:'1,000 lbs (FWD)'},
+ parts:{
+   oilFilters:[
+     {brand:'Mopar',pn:'05281090AB',notes:'OEM — 4.5 qt 5W-30',links:[L('AutoZone','Mopar 05281090AB Jeep Patriot oil filter','$8.99'),L('Amazon','05281090AB Patriot oil filter','~$7.99')]},
+     {brand:'Fram',pn:'PH10060',notes:'Budget alternative',links:[L('AutoZone','Fram PH10060','$6.99'),L('Amazon','Fram PH10060','~$5.99')]},
+   ],
+   airFilters:[
+     {brand:'Mopar',pn:'04891735AC',notes:'OEM 2.0L Patriot',links:[L('AutoZone','Mopar 04891735AC Patriot air filter','$18.99'),L('Amazon','04891735AC Jeep Patriot air filter','~$15.99')]},
+     {brand:'K&N',pn:'33-2373',notes:'Washable/reusable hi-flow',links:[L('Amazon','K&N 33-2373 Jeep Patriot 2.0','~$54.99')]},
+   ],
+   cabinFilters:[{brand:'Mopar',pn:'05058693AA',notes:'OEM cabin/pollen filter',links:[L('AutoZone','Mopar 05058693AA Patriot cabin filter','$16.99'),L('Amazon','05058693AA Patriot cabin filter','~$13.99')]}],
+   sparkPlugs:[
+     {brand:'Champion',pn:'OE016',notes:'OEM spec — × 4 req\'d',links:[L('AutoZone','Champion 7989 Jeep Patriot 2.0 spark plug','$8.99/ea'),L('Amazon','Champion OE016 Patriot 2.0L','~$7.99/ea')]},
+     {brand:'NGK Iridium IX',pn:'IZFR5B11',notes:'Upgrade — × 4 req\'d',links:[L('Amazon','NGK IZFR5B11 Jeep Patriot 2.0','~$9.99/ea')]},
+   ],
+   brakes:{
+     frontPads:[
+       {brand:'Mopar',pn:'5093537AA',notes:'OEM ceramic front',links:[L('AutoZone','Mopar 5093537AA Patriot front brake pads','$44.99'),L('Amazon','Mopar Patriot front brake pads 2008','~$39.99')]},
+       {brand:'Wagner ThermoQuiet',pn:'QC979A',notes:'Quiet ceramic upgrade',links:[L('Amazon','Wagner QC979A Jeep Patriot front','~$34.99')]},
+     ],
+     rearPads:[],
+     rearShoes:[
+       {brand:'Mopar',pn:'05191030AA',notes:'⚠️ REAR DRUM BRAKES — FWD trim has shoes, NOT pads. Full set (both sides).',links:[L('AutoZone','Mopar 05191030AA Patriot rear brake shoes','$34.99'),L('Amazon','Jeep Patriot FWD rear brake shoes 2008','~$29.99')]},
+       {brand:'Raybestos',pn:'751PG',notes:'OEM+ quality shoes',links:[L('Amazon','Raybestos 751PG Jeep Patriot rear shoes','~$32.99')]},
+     ],
+     rearDrums:[
+       {brand:'Mopar',pn:'05191033AA',notes:'⚠️ Rear brake drum — FWD trim only',links:[L('AutoZone','Jeep Patriot rear brake drum 2008 FWD','$54.99'),L('Amazon','Patriot rear drum brake 2008','~$44.99')]},
+     ],
+     frontRotors:[{brand:'Mopar',pn:'68001693AA',notes:'OEM front rotor',links:[L('AutoZone','Jeep Patriot front brake rotor 2008','$64.99'),L('RockAuto','Jeep Patriot 2.0 front rotor 2008',null)]}],
+     rearRotors:[],
+   },
+   battery:[{brand:'Mopar',pn:'Group 34/78',notes:'550+ CCA — dual-terminal preferred',links:[L('AutoZone','Group 34 78 battery Jeep Patriot','$149.99'),L('Amazon','Optima YellowTop D34 78 battery','~$249.99')]}],
+   tires:{size:'P205/70R16',psi:'32 F / 32 R',notes:'',options:[
+     {brand:'Michelin Defender T+H',links:[L('Tire Rack','Michelin Defender TH 205/70R16','~$149/ea')]},
+     {brand:'Goodyear Assurance All-Season',links:[L('Tire Rack','Goodyear Assurance AllSeason 205/70R16','~$129/ea')]},
+   ]},
+   transmissionFluid:[{brand:'Mopar CVT NS-2',pn:'05191184AB',notes:'⚠️ CVT ONLY — standard ATF destroys CVT. 8–9 qt total.',links:[L('Amazon','Mopar NS-2 CVT fluid 05191184AB','~$15.99/qt'),L('AutoZone','Mopar CVT NS2 fluid Patriot','$16.99/qt')]}],
+   coolant:[{brand:'Mopar HOAT',pn:'5013457AA',notes:'Red/orange HOAT — do NOT mix with green IIIG',links:[L('AutoZone','Mopar 5013457AA HOAT coolant Patriot','$16.99/gal'),L('Amazon','Mopar HOAT coolant 5013457AA','~$15.99/gal')]}],
+   differentialFluid:[],
+ }},
+];
+
+const SEED_LOGS=[
+ {vehicleId:'v1',date:'2024-10-01',mileage:179000,service:'Oil Change',cost:75,tech:'In-house',notes:'FL-820-S · 6qt 5W-20 Mobil 1.',parts:'FL-820-S'},
+ {vehicleId:'v1',date:'2024-06-15',mileage:174000,service:'Tire Rotation',cost:0,tech:'In-house',notes:'Tread even across all 4.',parts:''},
+ {vehicleId:'v2',date:'2024-09-15',mileage:109000,service:'Oil Change',cost:75,tech:'In-house',notes:'FL-820-S · 6qt 5W-20. New engine running well.',parts:'FL-820-S'},
+ {vehicleId:'v2',date:'2024-01-10',mileage:100000,service:'Engine Replacement',cost:4200,tech:'Ford Dealer',notes:'New OEM Ford 5.4L Triton installed. Trans inspected, all fluids changed at same time.',parts:'Ford OEM 5.4L Triton'},
+ {vehicleId:'v3',date:'2024-11-05',mileage:84000,service:'Oil Change',cost:95,tech:'VW Specialist',notes:'Mann HU816x · 4.3qt VW 507.00 spec 5W-30. DSG fluid checked — OK.',parts:'HU 816 x'},
+ {vehicleId:'v3',date:'2024-05-20',mileage:80000,service:'Timing Belt Kit',cost:680,tech:'VW Specialist',notes:'Gates TCK328B full kit + water pump replaced. Next due at 120,000 mi.',parts:'Gates TCK328B'},
+ {vehicleId:'v4',date:'2024-10-20',mileage:139000,service:'Oil Change',cost:70,tech:'In-house',notes:'FL-910S · 5.7qt 5W-30.',parts:'FL-910S'},
+ {vehicleId:'v4',date:'2024-07-01',mileage:135000,service:'Brake Pads – Front',cost:190,tech:'Shop B',notes:'Motorcraft BR-5389A installed.',parts:'BR-5389A'},
+ {vehicleId:'v5',date:'2024-11-30',mileage:184000,service:'Oil Change',cost:75,tech:'In-house',notes:'FL-910S · 6qt 5W-30. Oil level normal at next check.',parts:'FL-910S'},
+ {vehicleId:'v5',date:'2023-09-10',mileage:160000,service:'Turbo Rebuild',cost:2800,tech:'Turbo Specialist',notes:'Both turbos rebuilt. New OEM catalytic converters both banks installed.',parts:'OEM Turbos + Cats'},
+ {vehicleId:'v6',date:'2024-09-01',mileage:179000,service:'Oil Change',cost:65,tech:'In-house',notes:'26300-35502 · 5.3qt 5W-20.',parts:'26300-35502'},
+ {vehicleId:'v6',date:'2024-10-15',mileage:179500,service:'New Tires Installed',cost:680,tech:'Tire Shop',notes:'4x Yokohama tires installed. Alignment checked — within spec.',parts:'Yokohama P235/65R16'},
+ {vehicleId:'v7',date:'2024-08-20',mileage:169000,service:'Oil Change',cost:60,tech:'In-house',notes:'05281090AB · 4.5qt 5W-30.',parts:'05281090AB'},
+ {vehicleId:'v7',date:'2024-11-01',mileage:170000,service:'Control Arm Replacement',cost:340,tech:'Shop A',notes:'Both front lower control arms replaced. Alignment performed after.',parts:'New OEM-style lower CAs'},
+];
+
+// ── State ─────────────────────────────────────────────────────────────────────
+const S={
+  vehicles:[],logs:[],
+  screen:'dashboard',
+  vehicleId:null,
+  tab:'specs',
+  catKey:'oilFilters',
+  logFilter:'all',
+  addLogVehicleId:null,
+};
+
+// ── DB ────────────────────────────────────────────────────────────────────────
+async function seedIfEmpty(){
+  const snap=await getDocs(vcol);
+  if(!snap.empty)return;
+  const batch=writeBatch(db);
+  SEED_VEHICLES.forEach(v=>{const r=doc(vcol,v.id);batch.set(r,v);});
+  SEED_LOGS.forEach((l,i)=>{const r=doc(lcol,`log_${String(i+1).padStart(3,'0')}`);batch.set(r,l);});
+  await batch.commit();
+}
+
+async function saveVehicle(data){
+  if(data.id){await setDoc(doc(vcol,data.id),data);}
+  else{
+    const id='v'+Date.now();
+    data.id=id;
+    data.parts=data.parts||SEED_VEHICLES[0].parts;
+    await setDoc(doc(vcol,id),data);
+  }
+}
+
+async function addLog(data){
+  await addDoc(lcol,data);
+  const v=S.vehicles.find(v=>v.id===data.vehicleId);
+  if(v&&data.mileage>=(v.currentMileage||0)){
+    await updateDoc(doc(vcol,data.vehicleId),{currentMileage:data.mileage});
+  }
+}
+
+function setupListeners(){
+  onSnapshot(vcol,snap=>{
+    S.vehicles=snap.docs.map(d=>({...d.data(),id:d.id}));
+    S.vehicles.sort((a,b)=>{
+      const na=parseInt(a.id.replace('v',''));
+      const nb=parseInt(b.id.replace('v',''));
+      return na-nb;
+    });
+    if(!S.loading)render();
+  });
+  onSnapshot(query(lcol,orderBy('date','desc')),snap=>{
+    S.logs=snap.docs.map(d=>({...d.data(),id:d.id}));
+    if(!S.loading)render();
+  });
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function nav(screen,opts={}){
+  Object.assign(S,{screen},opts);
+  render();
+  window.scrollTo(0,0);
+}
+
+function lastLog(vid,svc){
+  return S.logs.filter(l=>l.vehicleId===vid&&l.service===svc).sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
+}
+
+function dueAlerts(v){
+  const alerts=[];
+  const now=new Date();
+  Object.entries(INTERVALS).forEach(([svc,{mi:iMi,mo:iMo}])=>{
+    const last=lastLog(v.id,svc);
+    if(!last)return;
+    const miSince=(v.currentMileage||0)-last.mileage;
+    const moSince=(now-new Date(last.date))/(1000*60*60*24*30.44);
+    const miPct=iMi?miSince/iMi:0;
+    const moPct=iMo?moSince/iMo:0;
+    const pct=Math.max(miPct,moPct);
+    if(pct>=1)alerts.push({svc,status:'overdue',pct});
+    else if(pct>=0.8)alerts.push({svc,status:'due soon',pct});
+  });
+  return alerts.sort((a,b)=>b.pct-a.pct);
+}
+
+// ── HTML helpers ──────────────────────────────────────────────────────────────
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+function renderLinks(links){
+  if(!links||!links.length)return'';
+  return`<div class="links">${links.map(l=>`<a class="link-btn" href="${esc(l.url)}" target="_blank" rel="noopener">🔗 ${esc(l.store)}<span class="link-price">${l.price?esc(l.price):''}</span></a>`).join('')}</div>`;
+}
+
+function renderPartCard(p,hl=false){
+  const isWarn=p.notes&&(p.notes.startsWith('⚠️')||p.notes.includes('MANDATORY')||p.notes.includes('CRITICAL')||p.notes.includes('ONLY'));
+  const curated=p.links||[];
+  const extras=autoStoreLinks(p.brand,p.pn,curated);
+  const extraHtml=extras.length?`<div class="links" style="margin-top:4px;padding-top:4px;border-top:1px solid var(--bdr)">${extras.map(l=>`<a class="link-btn" style="color:var(--t2);border-color:color-mix(in srgb,var(--t2) 25%,transparent)" href="${esc(l.url)}" target="_blank" rel="noopener">🔗 ${esc(l.store)}</a>`).join('')}</div>`:'';
+  return`<div class="sub-card${hl?' sub-card-hl':''}${isWarn?' sub-card-red':''}">
+    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;margin-bottom:3px">
+      <span class="part-brand">${esc(p.brand)}</span>
+      <span class="part-pn">#${esc(p.pn)}</span>
+    </div>
+    ${p.notes?`<div class="part-note${isWarn?' part-note-warn':''}">${esc(p.notes)}</div>`:''}
+    ${renderLinks(curated)}
+    ${extraHtml}
+  </div>`;
+}
+
+// ── Screen: Dashboard (The Garage) ────────────────────────────────────────────
+function renderDashboard(){
+  const totalMi=S.vehicles.reduce((s,v)=>s+(Number(v.currentMileage)||0),0);
+  const totalCost=S.logs.reduce((s,l)=>s+(parseFloat(l.cost)||0),0);
+  const cards=S.vehicles.map((v,idx)=>{
+    const spot=idx+1;
+    const alerts=dueAlerts(v);
+    const over=alerts.filter(a=>a.status==='overdue').length;
+    const soon=alerts.filter(a=>a.status==='due soon').length;
+    const last=S.logs.filter(l=>l.vehicleId===v.id)[0];
+    const cost=S.logs.filter(l=>l.vehicleId===v.id).reduce((s,l)=>s+(parseFloat(l.cost)||0),0);
+    const bdrColor=over>0?'color-mix(in srgb,var(--red) 40%,transparent)':soon>0?'color-mix(in srgb,var(--amb) 30%,transparent)':'var(--bdr)';
+    return`<button class="card" style="width:100%;text-align:left;border:1px solid ${bdrColor};cursor:pointer" data-nav="vehicle" data-vid="${esc(v.id)}">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px">
+        <div style="background:var(--amb);color:#000;font-size:9px;font-weight:800;letter-spacing:.08em;padding:2px 7px;border-radius:3px;white-space:nowrap;flex-shrink:0">SPOT ${spot}</div>
+        <div style="height:1px;flex:1;background:var(--bdr)"></div>
+      </div>
+      <div class="vh-row">
+        <div><div class="vh-name">${esc(v.nickname)}</div><div class="vh-eng">${esc(v.engine)}</div></div>
+        <div style="text-align:right"><div class="vh-mi">${Number(v.currentMileage||0).toLocaleString()} mi</div>${cost>0?`<div class="vh-cost">$${cost.toLocaleString()} logged</div>`:''}</div>
+      </div>
+      <div class="tags" style="margin-top:6px">
+        ${v.fuelType?`<span class="tag ${v.fuelType==='Diesel'?'tag-blu':'tag-dim'}">${esc(v.fuelType)}</span>`:''}
+        ${v.driveType?`<span class="tag tag-dim">${esc(v.driveType)}</span>`:''}
+        ${over>0?`<span class="tag tag-red">${over} OVERDUE</span>`:''}
+        ${soon>0?`<span class="tag tag-amb">${soon} DUE SOON</span>`:''}
+        ${over===0&&soon===0&&Object.keys(INTERVALS).some(s=>lastLog(v.id,s))?'<span class="tag tag-grn">ALL CURRENT</span>':''}
+      </div>
+      ${last?`<div class="vh-last">Last: ${esc(last.service)} · ${esc(last.date)}</div>`:''}
+    </button>`;
+  }).join('');
+
+  return`<div class="hdr">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <div style="font-size:10px;color:var(--amb);letter-spacing:.12em;font-weight:700;margin-bottom:2px">⚙ FLEET MASTER</div>
+        <div style="font-size:22px;font-weight:800;letter-spacing:.01em">🏠 THE GARAGE</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
+        <span style="font-size:10px;color:var(--t2)">LIVE</span>
+        <span class="sync-dot" id="sync-dot"></span>
+      </div>
+    </div>
+    <div class="fleet-stats" style="margin-top:12px">
+      <div class="fstat"><div class="fstat-lbl">SPOTS USED</div><div class="fstat-val" style="color:var(--amb)">${S.vehicles.length}</div></div>
+      <div class="fstat"><div class="fstat-lbl">FLEET MILES</div><div class="fstat-val">${totalMi.toLocaleString()}</div></div>
+      <div class="fstat"><div class="fstat-lbl">COST LOGGED</div><div class="fstat-val" style="color:var(--grn)">$${totalCost.toLocaleString()}</div></div>
+      <div class="fstat"><div class="fstat-lbl">RECORDS</div><div class="fstat-val">${S.logs.length}</div></div>
+    </div>
+  </div>
+  <div class="wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-size:10px;color:var(--t2);letter-spacing:.1em;font-weight:700">VEHICLES IN THE GARAGE</div>
+      <button class="btn-sm-ghost" data-nav="allLogs">VIEW ALL LOGS</button>
+    </div>
+    ${cards}
+    <button class="add-dashed" data-nav="addVehicle">+ ADD VEHICLE TO GARAGE</button>
+  </div>`;
+}
+
+// ── Screen: Vehicle Detail ─────────────────────────────────────────────────────
+function renderVehicle(){
+  const v=S.vehicles.find(x=>x.id===S.vehicleId);
+  if(!v)return renderDashboard();
+  const spotNum=S.vehicles.findIndex(x=>x.id===S.vehicleId)+1;
+  const alerts=dueAlerts(v);
+  const over=alerts.filter(a=>a.status==='overdue').length;
+  const soon=alerts.filter(a=>a.status==='due soon').length;
+
+  const hdr=`<div class="hdr">
+    <div class="hdr-row" style="margin-bottom:8px">
+      <button class="back-btn" data-nav="dashboard">←</button>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">
+          <div style="background:var(--amb);color:#000;font-size:9px;font-weight:800;letter-spacing:.08em;padding:1px 6px;border-radius:3px">SPOT ${spotNum}</div>
+          <div class="hdr-title" style="font-size:14px;margin:0">${esc(v.nickname)}</div>
+        </div>
+        <div class="hdr-sub">${esc(v.engine)}</div>
+      </div>
+      <button class="btn-sm-ghost" data-nav="editVehicle">EDIT</button>
+    </div>
+    <div class="tags" style="margin-bottom:8px">
+      <span class="tag tag-amb">${Number(v.currentMileage||0).toLocaleString()} mi</span>
+      ${v.vin?`<span class="tag tag-dim">VIN: ${esc(v.vin)}</span>`:''}
+      ${v.fuelType?`<span class="tag ${v.fuelType==='Diesel'?'tag-blu':'tag-dim'}">${esc(v.fuelType)}</span>`:''}
+      ${v.driveType?`<span class="tag tag-dim">${esc(v.driveType)}</span>`:''}
+      ${over>0?`<span class="tag tag-red">${over} OVERDUE</span>`:''}
+      ${soon>0?`<span class="tag tag-amb">${soon} DUE SOON</span>`:''}
+    </div>
+    <div class="tabs">
+      ${['specs','parts','history','alerts'].map(t=>`<button class="tab-btn${S.tab===t?' active':''}" data-tab="${t}">${t==='specs'?'SPECS':t==='parts'?'PARTS REF':t==='history'?'SERVICE LOG':'DUE / ALERTS'}</button>`).join('')}
+    </div>
+  </div>
+  <div class="wrap">`;
+
+  let body='';
+  if(S.tab==='specs') body=renderSpecsTab(v);
+  else if(S.tab==='parts') body=renderPartsTab(v);
+  else if(S.tab==='history') body=renderHistoryTab(v);
+  else if(S.tab==='alerts') body=renderAlertsTab(v);
+
+  return hdr+body+'</div>';
+}
+
+function renderSpecsTab(v){
+  const rows=Object.entries(v.specs||{});
+  const labels={hp:'HP / POWER',torque:'TORQUE',trans:'TRANSMISSION',drive:'DRIVE',fuelCap:'FUEL CAPACITY',oilCap:'OIL CAPACITY',oilType:'OIL TYPE',coolantCap:'COOLANT CAPACITY',tireSize:'TIRE SIZE',battGrp:'BATTERY GROUP',tirePSI:'TIRE PSI',sparkPlugGap:'SPARK PLUG GAP',towCap:'TOW CAPACITY'};
+  const table=`<div style="background:#0a0b14;border:1px solid var(--bdr);border-radius:6px;overflow:hidden;margin-bottom:14px">
+    ${rows.map(([k,val],i)=>{
+      const isWarn=String(val).includes('MANDATORY')||String(val).includes('ONLY')||String(val).includes('TBD')||String(val).includes('verify');
+      return`<div class="spec-row"${i>0?'':' style="border-top:none"'}>
+        <div class="spec-key">${esc(labels[k]||k)}</div>
+        <div class="spec-val${isWarn?' spec-val-warn':''}">${esc(val)}</div>
+      </div>`;
+    }).join('')}
+  </div>`;
+  const notes=v.notes?`<div class="note-box"><div class="note-box-head">⚠️ NOTES & CAUTIONS</div><div class="note-box-txt">${esc(v.notes)}</div></div>`:'';
+  return table+notes;
+}
+
+// ── Video suggestions per category ────────────────────────────────────────────
+const VIDEO_TOPICS={
+  oilFilters:   {topic:'oil change',          label:'Oil Change'},
+  airFilters:   {topic:'air filter replacement', label:'Air Filter Replacement'},
+  cabinFilters: {topic:'cabin air filter replacement', label:'Cabin Air Filter'},
+  fuelFilter:   {topic:'fuel filter replacement', label:'Fuel Filter Replacement'},
+  sparkPlugs:   {topic:'spark plug replacement', label:'Spark Plug Replacement'},
+  glowPlugs:    {topic:'glow plug replacement diesel', label:'Glow Plug Replacement'},
+  timingBelt:   {topic:'timing belt replacement', label:'Timing Belt Replacement'},
+  brakes:       {topic:'brake pad rotor replacement', label:'Brake Job'},
+  battery:      {topic:'battery replacement',   label:'Battery Replacement'},
+  tires:        {topic:'tire rotation balance', label:'Tire Rotation & Balance'},
+  transmissionFluid:{topic:'transmission fluid change service', label:'Trans Fluid Service'},
+  coolant:      {topic:'coolant flush replacement', label:'Coolant Flush'},
+  differentialFluid:{topic:'differential fluid change', label:'Differential Fluid Change'},
+};
+
+function renderVideoSection(v,catKey){
+  const vt=VIDEO_TOPICS[catKey];
+  if(!vt)return'';
+  const yr=v.year||'';
+  const mk=v.make||'';
+  const md=v.model||'';
+  const eng=v.engine||'';
+  const enc=s=>encodeURIComponent(s);
+  const ytBase='https://www.youtube.com/results?search_query=';
+  const videos=[
+    {label:`${yr} ${mk} ${md} ${vt.label}`,
+     url:`${ytBase}${enc(`${yr} ${mk} ${md} ${vt.topic}`)}`},
+    {label:`${mk} ${md} ${eng.split(' ').slice(0,3).join(' ')} ${vt.label}`,
+     url:`${ytBase}${enc(`${mk} ${md} ${eng} ${vt.topic}`)}`},
+    {label:`How to: ${vt.label} — DIY Guide`,
+     url:`${ytBase}${enc(`how to ${vt.topic} DIY step by step`)}`},
+    {label:`${vt.label} Tips & Common Mistakes`,
+     url:`${ytBase}${enc(`${vt.topic} tips mistakes avoid`)}`},
+  ];
+  return`<div style="background:#0a0f0a;border:1px solid color-mix(in srgb,var(--grn) 25%,transparent);border-radius:6px;padding:11px 13px;margin-top:16px">
+    <div style="font-size:10px;color:var(--grn);letter-spacing:.1em;font-weight:700;margin-bottom:8px">▶ HOW-TO VIDEOS — ${esc(vt.label.toUpperCase())}</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      ${videos.map(vd=>`<a href="${esc(vd.url)}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;background:#0c150c;border:1px solid color-mix(in srgb,var(--grn) 20%,transparent);border-radius:4px;padding:7px 10px;text-decoration:none">
+        <span style="font-size:14px;flex-shrink:0">▶️</span>
+        <span style="font-size:11px;color:var(--txt);line-height:1.4">${esc(vd.label)}</span>
+        <span style="font-size:10px;color:var(--grn);margin-left:auto;flex-shrink:0">YouTube →</span>
+      </a>`).join('')}
+    </div>
+    <div style="font-size:10px;color:var(--t3);margin-top:7px">Links open YouTube searches specific to this vehicle</div>
+  </div>`;
+}
+
+const PARTS_CATS=[
+  {key:'oilFilters',icon:'🛢',label:'OIL FILTERS'},
+  {key:'airFilters',icon:'💨',label:'AIR FILTERS'},
+  {key:'cabinFilters',icon:'🌬',label:'CABIN FILTER'},
+  {key:'fuelFilter',icon:'⛽',label:'FUEL FILTER'},
+  {key:'sparkPlugs',icon:'⚡',label:'SPARK PLUGS'},
+  {key:'glowPlugs',icon:'🔆',label:'GLOW PLUGS'},
+  {key:'timingBelt',icon:'⚙️',label:'TIMING BELT'},
+  {key:'brakes',icon:'🔴',label:'BRAKES'},
+  {key:'battery',icon:'🔋',label:'BATTERY'},
+  {key:'tires',icon:'⭕',label:'TIRES'},
+  {key:'transmissionFluid',icon:'🔧',label:'TRANS FLUID'},
+  {key:'coolant',icon:'🌡',label:'COOLANT'},
+  {key:'differentialFluid',icon:'⚙️',label:'DIFF FLUID'},
+];
+
+function partsHasData(v,key){
+  const p=v.parts||{};
+  if(!p[key])return false;
+  if(key==='brakes')return true;
+  if(key==='tires')return!!(p.tires&&p.tires.size);
+  if(Array.isArray(p[key]))return p[key].length>0;
+  return Object.keys(p[key]).length>0;
+}
+
+function renderPartsTab(v){
+  const avail=PARTS_CATS.filter(c=>partsHasData(v,c.key));
+  const catBtns=avail.map(c=>`<button class="cat-btn${S.catKey===c.key?' active':''}" data-cat="${c.key}">${c.icon} ${c.label}</button>`).join('');
+  let content='';
+  const p=v.parts||{};
+  const ck=S.catKey;
+  if(ck==='brakes'){
+    const b=p.brakes||{};
+    content+=b.frontPads?.length?`<div class="sec-head">FRONT BRAKE PADS</div>${b.frontPads.map(x=>renderPartCard(x)).join('')}`:'';
+    content+=b.rearPads?.length?`<div class="sec-head">REAR BRAKE PADS</div>${b.rearPads.map(x=>renderPartCard(x)).join('')}`:'';
+    content+=b.rearShoes?.length?`<div class="sec-head">⚠️ REAR BRAKE SHOES (DRUMS)</div>${b.rearShoes.map(x=>renderPartCard(x,true)).join('')}`:'';
+    content+=b.rearDrums?.length?`<div class="sec-head">REAR BRAKE DRUMS</div>${b.rearDrums.map(x=>renderPartCard(x)).join('')}`:'';
+    content+=b.frontRotors?.length?`<div class="sec-head">FRONT ROTORS</div>${b.frontRotors.map(x=>renderPartCard(x)).join('')}`:'';
+    content+=b.rearRotors?.length?`<div class="sec-head">REAR ROTORS</div>${b.rearRotors.map(x=>renderPartCard(x)).join('')}`:'';
+  } else if(ck==='tires'){
+    const ti=p.tires||{};
+    content+=`<div class="tire-info">
+      <div class="tags" style="margin-bottom:${ti.notes?'8':'0'}px">
+        ${ti.size?`<span class="tag tag-amb">SIZE: ${esc(ti.size)}</span>`:''}
+        ${ti.psi?`<span class="tag tag-blu">PSI: ${esc(ti.psi)}</span>`:''}
+      </div>
+      ${ti.notes?`<div style="font-size:11px;color:var(--amb);margin-top:6px">${esc(ti.notes)}</div>`:''}
+    </div>`;
+    content+=`<div class="sec-head">TIRE OPTIONS</div>`;
+    content+=(ti.options||[]).map(o=>`<div class="sub-card"><div class="part-brand" style="margin-bottom:5px">${esc(o.brand)}</div>${renderLinks(o.links)}</div>`).join('');
+  } else {
+    const items=p[ck];
+    if(!items||!items.length) content='<div class="empty">No parts listed for this category</div>';
+    else content=items.map(x=>renderPartCard(x)).join('');
+  }
+  return`<div class="cat-btns">${catBtns}</div>${content}${renderVideoSection(v,ck)}`;
+}
+
+function renderHistoryTab(v){
+  const vLogs=S.logs.filter(l=>l.vehicleId===v.id);
+  const total=vLogs.reduce((s,l)=>s+(parseFloat(l.cost)||0),0);
+  const rows=vLogs.map(l=>`<div class="log-row">
+    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;margin-bottom:3px">
+      <span class="log-svc">${esc(l.service)}</span>
+      <span class="log-cost">${l.cost>0?'$'+Number(l.cost).toLocaleString():''}</span>
+    </div>
+    <div class="log-meta">
+      <span>📅 ${esc(l.date)}</span>
+      <span>📍 ${Number(l.mileage||0).toLocaleString()} mi</span>
+      ${l.tech?`<span>🔧 ${esc(l.tech)}</span>`:''}
+    </div>
+    ${l.parts?`<div style="font-size:11px;color:var(--t2);margin-top:2px">🧩 ${esc(l.parts)}</div>`:''}
+    ${l.notes?`<div class="log-note">${esc(l.notes)}</div>`:''}
+  </div>`).join('');
+  return`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div style="font-size:12px;color:var(--t2)">${vLogs.length} records · <span style="color:var(--grn)">$${total.toLocaleString()} total</span></div>
+    <button class="btn-sm" data-nav="addLog" data-addvid="${esc(v.id)}">+ ADD LOG</button>
+  </div>
+  ${vLogs.length?rows:'<div class="empty">No service records yet</div>'}`;
+}
+
+function renderAlertsTab(v){
+  const alerts=dueAlerts(v);
+  const over=alerts.filter(a=>a.status==='overdue');
+  const soon=alerts.filter(a=>a.status==='due soon');
+  let html='';
+  if(over.length||soon.length){
+    html+=`<div class="sec-head">ACTION NEEDED</div>`;
+    html+=over.map(a=>`<div class="alert-item alert-overdue"><span style="font-size:12px;color:var(--txt)">${esc(a.svc)}</span><span class="tag tag-red">OVERDUE</span></div>`).join('');
+    html+=soon.map(a=>`<div class="alert-item alert-soon"><span style="font-size:12px;color:var(--txt)">${esc(a.svc)}</span><span class="tag tag-amb">DUE SOON</span></div>`).join('');
+  } else {
+    html+=`<div class="all-good"><span style="color:var(--grn);font-size:12px;font-weight:600">✓ All tracked services are current</span></div>`;
+  }
+  html+=`<div class="sec-head">TRACKED SERVICE INTERVALS</div>`;
+  html+=Object.entries(INTERVALS).map(([svc,{mi:iMi,mo:iMo}])=>{
+    const last=lastLog(v.id,svc);
+    return`<div class="intv-row">
+      <div><div class="intv-svc">${esc(svc)}</div>
+      <div class="intv-schedule">${iMi?`Every ${iMi.toLocaleString()} mi`:''}${iMi&&iMo?' / ':''}${iMo?`Every ${iMo} mo`:''}</div></div>
+      <div class="intv-last">${last?`<div class="intv-last-date">${esc(last.date)}</div><div class="intv-last-mi">${Number(last.mileage||0).toLocaleString()} mi</div>`:`<span style="font-size:10px;color:var(--t3);font-style:italic">no record</span>`}</div>
+    </div>`;
+  }).join('');
+  return html;
+}
+
+// ── Screen: Add Log ────────────────────────────────────────────────────────────
+function renderAddLog(){
+  const v=S.vehicles.find(x=>x.id===(S.addLogVehicleId||S.vehicleId));
+  const today=new Date().toISOString().split('T')[0];
+  const vopts=S.vehicles.map(x=>`<option value="${esc(x.id)}"${x.id===(S.addLogVehicleId||S.vehicleId)?'selected':''}>${esc(x.nickname)}</option>`).join('');
+  const svcopts=SERVICE_TYPES.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');
+  return`<div class="hdr">
+    <div class="hdr-row">
+      <button class="back-btn" data-nav="${v?'vehicle':'dashboard'}" data-vid="${v?v.id:''}">←</button>
+      <div class="hdr-title">ADD SERVICE LOG</div>
+    </div>
+    ${v?`<div style="font-size:11px;color:var(--amb);margin-top:4px;padding-left:2px">${esc(v.nickname)}</div>`:''}
+  </div>
+  <div class="wrap" style="max-width:500px">
+    <div class="fld"><label>VEHICLE</label><select class="inp" id="log-vid">${vopts}</select></div>
+    <div class="fld"><label>SERVICE TYPE</label><select class="inp" id="log-svc">${svcopts}</select></div>
+    <div class="row2">
+      <div class="fld"><label>DATE</label><input class="inp" type="date" id="log-date" value="${today}"></div>
+      <div class="fld"><label>MILEAGE</label><input class="inp" type="number" id="log-mi" placeholder="${Number(v?.currentMileage||0).toLocaleString()}" value="${v?.currentMileage||''}"></div>
+    </div>
+    <div class="row2">
+      <div class="fld"><label>COST ($)</label><input class="inp" type="number" id="log-cost" placeholder="0"></div>
+      <div class="fld"><label>TECH / SHOP</label><input class="inp" type="text" id="log-tech" placeholder="In-house / Shop name"></div>
+    </div>
+    <div class="fld"><label>PARTS USED</label><input class="inp" type="text" id="log-parts" placeholder="Part numbers or brand names"></div>
+    <div class="fld"><label>NOTES</label><textarea class="inp" id="log-notes" rows="4" style="resize:vertical;line-height:1.6" placeholder="Observations, specs, next service info…"></textarea></div>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn-primary" style="flex:1" id="save-log-btn">SAVE LOG ENTRY</button>
+      <button class="btn-ghost" data-nav="${v?'vehicle':'dashboard'}" data-vid="${v?v.id:''}">CANCEL</button>
+    </div>
+  </div>`;
+}
+
+// ── Screen: Add/Edit Vehicle ──────────────────────────────────────────────────
+function renderVehicleForm(v){
+  const isEdit=!!v;
+  const g=(k,def='')=>esc(v?v[k]||def:def);
+  const gs=(k,def='')=>esc(v?v.specs?.[k]||def:def);
+  const driveOpts=['','FWD','RWD','4WD','AWD'].map(d=>`<option value="${d}"${(v?.driveType||'')==d?'selected':''}>${d||'— select —'}</option>`).join('');
+  const fuelOpts=['Gasoline','Diesel','Hybrid','Electric','Flex Fuel E85'].map(f=>`<option value="${f}"${(v?.fuelType||'Gasoline')===f?'selected':''}>${f}</option>`).join('');
+  return`<div class="hdr">
+    <div class="hdr-row">
+      <button class="back-btn" data-nav="${isEdit?'vehicle':'dashboard'}" data-vid="${g('id')}">←</button>
+      <div class="hdr-title">${isEdit?'EDIT VEHICLE':'ADD NEW VEHICLE'}</div>
+    </div>
+  </div>
+  <div class="wrap" style="max-width:540px">
+    <div style="font-size:10px;color:var(--amb);letter-spacing:.1em;font-weight:700;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--bdr)">IDENTIFICATION</div>
+    <div class="fld"><label>NICKNAME / FLEET ID</label><input class="inp" id="vf-nick" value="${g('nickname')}" placeholder="#8 – 2019 Ram 1500"></div>
+    <div class="row2">
+      <div class="fld"><label>YEAR</label><input class="inp" id="vf-year" type="number" value="${g('year')}" placeholder="2021"></div>
+      <div class="fld"><label>MAKE</label><input class="inp" id="vf-make" value="${g('make')}" placeholder="Ford"></div>
+    </div>
+    <div class="row2">
+      <div class="fld"><label>MODEL</label><input class="inp" id="vf-model" value="${g('model')}" placeholder="F-150"></div>
+      <div class="fld"><label>TRIM</label><input class="inp" id="vf-trim" value="${g('trim')}" placeholder="XLT"></div>
+    </div>
+    <div class="fld"><label>ENGINE</label><input class="inp" id="vf-eng" value="${g('engine')}" placeholder="5.0L Ti-VCT V8"></div>
+    <div class="fld"><label>VIN</label><input class="inp" id="vf-vin" value="${g('vin')}" placeholder="17-character VIN"></div>
+    <div class="row2">
+      <div class="fld"><label>LICENSE PLATE</label><input class="inp" id="vf-plate" value="${g('plate')}" placeholder="ABC-1234"></div>
+      <div class="fld"><label>COLOR</label><input class="inp" id="vf-color" value="${g('color')}" placeholder="Oxford White"></div>
+    </div>
+    <div class="row2">
+      <div class="fld"><label>FUEL TYPE</label><select class="inp" id="vf-fuel">${fuelOpts}</select></div>
+      <div class="fld"><label>DRIVE TYPE</label><select class="inp" id="vf-drive">${driveOpts}</select></div>
+    </div>
+    <div class="fld"><label>CURRENT MILEAGE</label><input class="inp" id="vf-mi" type="number" value="${g('currentMileage')}" placeholder="123456"></div>
+    <div style="font-size:10px;color:var(--amb);letter-spacing:.1em;font-weight:700;margin:16px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--bdr)">VEHICLE SPECS</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      ${[['vf-hp','HP / POWER','hp','300 hp @ 5000 rpm'],['vf-tq','TORQUE','torque','365 lb-ft @ 3750 rpm'],
+         ['vf-trans','TRANSMISSION','trans','6-Speed Auto'],['vf-oilcap','OIL CAPACITY','oilCap','6.0 qt'],
+         ['vf-oiltype','OIL TYPE','oilType','5W-30 Full Synthetic'],['vf-coolant','COOLANT CAPACITY','coolantCap','24 qt'],
+         ['vf-fuelcap','FUEL CAPACITY','fuelCap','26.0 gal'],['vf-tire','TIRE SIZE','tireSize','P275/55R20'],
+         ['vf-psi','TIRE PSI','tirePSI','35 F / 35 R'],['vf-batt','BATTERY GROUP','battGrp','Group 65'],
+         ['vf-plug','SPARK PLUG GAP','sparkPlugGap','0.054 in'],['vf-tow','TOW CAPACITY','towCap','11,000 lbs']
+        ].map(([id,lbl,k,ph])=>`<div style="flex:1 1 45%;min-width:130px" class="fld"><label>${lbl}</label><input class="inp" id="${id}" value="${gs(k)}" placeholder="${ph}"></div>`).join('')}
+    </div>
+    <div style="font-size:10px;color:var(--amb);letter-spacing:.1em;font-weight:700;margin:16px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--bdr)">NOTES & CAUTIONS</div>
+    <div class="fld"><textarea class="inp" id="vf-notes" rows="5" style="resize:vertical;line-height:1.6" placeholder="Special cautions, recent repairs, known issues…">${g('notes')}</textarea></div>
+    <div style="background:#0e100a;border:1px solid color-mix(in srgb,var(--grn) 25%,transparent);border-radius:6px;padding:10px 14px;margin-bottom:20px">
+      <div style="font-size:11px;color:var(--grn);margin-bottom:4px;font-weight:600">💡 Parts data</div>
+      <div style="font-size:11px;color:var(--t2);line-height:1.6">Parts data for new vehicles is added manually. Use the service log to record part numbers as you use them.</div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn-primary" style="flex:1" id="save-veh-btn" data-vid="${g('id')}">${isEdit?'SAVE CHANGES':'ADD VEHICLE TO FLEET'}</button>
+      <button class="btn-ghost" data-nav="${isEdit?'vehicle':'dashboard'}" data-vid="${g('id')}">CANCEL</button>
+    </div>
+  </div>`;
+}
+
+// ── Screen: All Logs ───────────────────────────────────────────────────────────
+function renderAllLogs(){
+  const vMap=Object.fromEntries(S.vehicles.map(v=>[v.id,v]));
+  const shown=S.logFilter==='all'?S.logs:S.logs.filter(l=>l.vehicleId===S.logFilter);
+  const total=shown.reduce((s,l)=>s+(parseFloat(l.cost)||0),0);
+  const filterBtns=[{id:'all',label:`ALL (${S.logs.length})`},...S.vehicles.map(v=>({id:v.id,label:`${v.nickname.split('–')[0].trim()} (${S.logs.filter(l=>l.vehicleId===v.id).length})`}))];
+  const rows=shown.map(l=>`<div class="log-row">
+    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;margin-bottom:3px">
+      <span class="log-svc">${esc(l.service)}</span>
+      <span class="log-cost">${l.cost>0?'$'+Number(l.cost).toLocaleString():''}</span>
+    </div>
+    <div class="log-veh">${esc(vMap[l.vehicleId]?.nickname||l.vehicleId)}</div>
+    <div class="log-meta">
+      <span>📅 ${esc(l.date)}</span>
+      <span>📍 ${Number(l.mileage||0).toLocaleString()} mi</span>
+      ${l.tech?`<span>🔧 ${esc(l.tech)}</span>`:''}
+    </div>
+    ${l.parts?`<div style="font-size:11px;color:var(--t2);margin-top:2px">🧩 ${esc(l.parts)}</div>`:''}
+    ${l.notes?`<div class="log-note">${esc(l.notes)}</div>`:''}
+  </div>`).join('');
+  return`<div class="hdr">
+    <div class="hdr-row" style="margin-bottom:8px">
+      <button class="back-btn" data-nav="dashboard">←</button>
+      <div class="hdr-title" style="flex:1">FLEET SERVICE LOG</div>
+      <button class="btn-sm" data-nav="addLog" data-addvid="">+ ADD</button>
+    </div>
+    <div class="filter-row">
+      ${filterBtns.map(f=>`<button class="filter-btn${S.logFilter===f.id?' active':''}" data-filter="${f.id}">${esc(f.label)}</button>`).join('')}
+    </div>
+  </div>
+  <div class="wrap">
+    <div style="font-size:11px;color:var(--t2);margin-bottom:10px">${shown.length} records · <span style="color:var(--grn)">$${total.toLocaleString()} total</span></div>
+    ${shown.length?rows:'<div class="empty">No records found</div>'}
+  </div>`;
+}
+
+// ── Render dispatcher ─────────────────────────────────────────────────────────
+function render(){
+  const app=document.getElementById('app');
+  switch(S.screen){
+    case'dashboard': app.innerHTML=renderDashboard();break;
+    case'vehicle':   app.innerHTML=renderVehicle();break;
+    case'addLog':    app.innerHTML=renderAddLog();break;
+    case'addVehicle':app.innerHTML=renderVehicleForm(null);break;
+    case'editVehicle':app.innerHTML=renderVehicleForm(S.vehicles.find(v=>v.id===S.vehicleId));break;
+    case'allLogs':   app.innerHTML=renderAllLogs();break;
+    default:         app.innerHTML=renderDashboard();
+  }
+  attachEvents();
+}
+
+// ── Events ────────────────────────────────────────────────────────────────────
+function attachEvents(){
+  document.querySelectorAll('[data-nav]').forEach(el=>{
+    el.addEventListener('click',e=>{
+      const screen=el.dataset.nav;
+      const vid=el.dataset.vid||null;
+      const addvid=el.dataset.addvid!==undefined?el.dataset.addvid:null;
+      if(vid)S.vehicleId=vid;
+      if(addvid!==null)S.addLogVehicleId=addvid||S.vehicleId;
+      if(screen==='vehicle'&&vid)S.tab='specs';
+      nav(screen,vid?{vehicleId:vid}:{});
+    });
+  });
+  document.querySelectorAll('[data-tab]').forEach(el=>{
+    el.addEventListener('click',()=>{S.tab=el.dataset.tab;render();});
+  });
+  document.querySelectorAll('[data-cat]').forEach(el=>{
+    el.addEventListener('click',()=>{S.catKey=el.dataset.cat;render();});
+  });
+  document.querySelectorAll('[data-filter]').forEach(el=>{
+    el.addEventListener('click',()=>{S.logFilter=el.dataset.filter;render();});
+  });
+  document.querySelectorAll('[data-vid]').forEach(el=>{
+    if(el.dataset.nav)return;
+    el.addEventListener('click',()=>{S.vehicleId=el.dataset.vid;nav('vehicle');});
+  });
+
+  // Save log
+  const saveLogBtn=document.getElementById('save-log-btn');
+  if(saveLogBtn){
+    saveLogBtn.addEventListener('click',async()=>{
+      const vid=document.getElementById('log-vid')?.value;
+      const svc=document.getElementById('log-svc')?.value;
+      const date=document.getElementById('log-date')?.value;
+      const mi=parseInt(document.getElementById('log-mi')?.value)||0;
+      if(!vid||!svc||!date){alert('Please fill in Vehicle, Service, and Date.');return;}
+      saveLogBtn.textContent='SAVING…';saveLogBtn.disabled=true;
+      try{
+        await addLog({vehicleId:vid,service:svc,date,mileage:mi,
+          cost:parseFloat(document.getElementById('log-cost')?.value)||0,
+          tech:document.getElementById('log-tech')?.value||'',
+          notes:document.getElementById('log-notes')?.value||'',
+          parts:document.getElementById('log-parts')?.value||''});
+        S.vehicleId=vid;S.tab='history';nav('vehicle');
+      }catch(e){alert('Error saving log: '+e.message);saveLogBtn.textContent='SAVE LOG ENTRY';saveLogBtn.disabled=false;}
+    });
+  }
+
+  // Save vehicle
+  const saveVehBtn=document.getElementById('save-veh-btn');
+  if(saveVehBtn){
+    saveVehBtn.addEventListener('click',async()=>{
+      const existId=saveVehBtn.dataset.vid;
+      const existing=existId?S.vehicles.find(v=>v.id===existId):null;
+      const data={
+        id:existId||null,
+        nickname:document.getElementById('vf-nick')?.value||'',
+        year:parseInt(document.getElementById('vf-year')?.value)||null,
+        make:document.getElementById('vf-make')?.value||'',
+        model:document.getElementById('vf-model')?.value||'',
+        trim:document.getElementById('vf-trim')?.value||'',
+        engine:document.getElementById('vf-eng')?.value||'',
+        vin:document.getElementById('vf-vin')?.value||'',
+        plate:document.getElementById('vf-plate')?.value||'',
+        color:document.getElementById('vf-color')?.value||'',
+        fuelType:document.getElementById('vf-fuel')?.value||'Gasoline',
+        driveType:document.getElementById('vf-drive')?.value||'',
+        currentMileage:parseInt(document.getElementById('vf-mi')?.value)||0,
+        notes:document.getElementById('vf-notes')?.value||'',
+        specs:{
+          hp:document.getElementById('vf-hp')?.value||'',
+          torque:document.getElementById('vf-tq')?.value||'',
+          trans:document.getElementById('vf-trans')?.value||'',
+          drive:document.getElementById('vf-drive')?.value||'',
+          oilCap:document.getElementById('vf-oilcap')?.value||'',
+          oilType:document.getElementById('vf-oiltype')?.value||'',
+          coolantCap:document.getElementById('vf-coolant')?.value||'',
+          fuelCap:document.getElementById('vf-fuelcap')?.value||'',
+          tireSize:document.getElementById('vf-tire')?.value||'',
+          tirePSI:document.getElementById('vf-psi')?.value||'',
+          battGrp:document.getElementById('vf-batt')?.value||'',
+          sparkPlugGap:document.getElementById('vf-plug')?.value||'',
+          towCap:document.getElementById('vf-tow')?.value||'',
+        },
+        parts:existing?.parts||{oilFilters:[],airFilters:[],cabinFilters:[],sparkPlugs:[],brakes:{frontPads:[],rearPads:[],rearShoes:[],rearDrums:[],frontRotors:[],rearRotors:[]},battery:[],tires:{size:'',psi:'',options:[]},transmissionFluid:[],coolant:[],differentialFluid:[]},
+      };
+      if(!data.nickname){alert('Please enter a nickname for this vehicle.');return;}
+      saveVehBtn.textContent='SAVING…';saveVehBtn.disabled=true;
+      try{
+        await saveVehicle(data);
+        S.vehicleId=data.id||existId;
+        nav(existId?'vehicle':'dashboard');
+      }catch(e){alert('Error saving vehicle: '+e.message);saveVehBtn.textContent=existId?'SAVE CHANGES':'ADD VEHICLE TO FLEET';saveVehBtn.disabled=false;}
+    });
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+async function init(){
+  try{
+    await seedIfEmpty();
+    setupListeners();
+    // Wait for first data load
+    await new Promise(res=>{
+      const unsub=onSnapshot(vcol,snap=>{
+        S.vehicles=snap.docs.map(d=>({...d.data(),id:d.id}));
+        unsub();res();
+      });
+    });
+    S.loading=false;
+    document.getElementById('loading').style.display='none';
+    document.getElementById('app').style.display='block';
+    render();
+  }catch(e){
+    document.getElementById('loading').innerHTML=`<div style="color:#e94444;text-align:center;padding:24px"><div style="font-size:14px;font-weight:700;margin-bottom:8px">CONNECTION ERROR</div><div style="font-size:12px;color:#7c8499">${esc(e.message)}</div><div style="font-size:11px;color:#7c8499;margin-top:8px">Check Firestore is enabled in test mode.</div></div>`;
+  }
+}
+
+init();
+</script>
+</body>
+</html>
